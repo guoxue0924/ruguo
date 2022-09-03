@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:mongo="http://www.springframework.org/schema/data/mongo"
+	xsi:schemaLocation="http://www.springframework.org/schema/data/mongo
+                      http://www.springframework.org/schema/data/mongo/spring-mongo.xsd
+                      http://www.springframework.org/schema/beans
+                      http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+
+	<mongo:mongo host="${mongo_host}" port="${mongo_port}" >
+		 <mongo:options connections-per-host="100" threads-allowed-to-block-for-connection-multiplier="50" connect-timeout="1000" max-wait-time="2500"
+                       auto-connect-retry="true" socket-keep-alive="true" socket-timeout="15000" slave-ok="true" />
+	</mongo:mongo>
+	<mongo:db-factory id="mongoDbFactory"  dbname="${mongo_dbname}" mongo-ref="mongo" />
+	
+	<!-- 映射转换器，扫描back-package目录下的文件，根据注释，把它们作为mongodb的一个collection的映射 -->  
+    <mongo:mapping-converter id="converter" base-package="com.mongodb.example.data.model" />  
+
+	<bean class="org.springframework.data.mongodb.gridfs.GridFsTemplate">
+		<constructor-arg ref="mongoDbFactory" />
+		<constructor-arg ref="converter" />
+	</bean>
+	
+    <!-- mongodb的主要操作对象，所有对mongodb的增删改查的操作都是通过它完成 -->  
+    <bean id="mongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">  
+        <constructor-arg name="mongoDbFactory" ref="mongoDbFactory" />  
+    </bean>  
+  
+    
+
+
+</beans>

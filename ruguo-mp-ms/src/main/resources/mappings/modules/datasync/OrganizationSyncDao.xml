@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.foundation.modules.datasync.organization.dao.OrganizationSyncDao">
+
+	<!-- 新增机构 -->
+	<insert id="addOrganization" parameterType="java.util.List">
+		insert into sys_organization
+			(
+				id,
+				parent_id,
+				parent_ids,
+				code,
+				name,
+				org_type,
+				level,
+				address,
+				contact_person,
+				contact_phone,
+				own_zone_code,
+				zone_code,
+				province,
+				province_code,
+				city,
+				city_code,
+				county,
+				county_code,
+				town,
+				town_code,
+				is_enable,
+				enable_date,
+				resource,
+				del_flag,
+				create_by,
+				create_time,
+				remarks
+			)values
+			<foreach collection="list" item="item" index="index" separator=",">
+			(
+				#{item.id},
+				#{item.parentId},
+				#{item.parentIds},
+				#{item.code},
+				#{item.name},
+				#{item.orgType},
+				#{item.level},
+				#{item.address},
+				#{item.contactPerson},
+				#{item.contactPhone},
+				#{item.ownZoneCode},
+				#{item.zoneCode},
+				#{item.province},
+				#{item.provinceCode},
+				#{item.city},
+				#{item.cityCode},
+				#{item.county},
+				#{item.countyCode},
+				#{item.town},
+				#{item.townCode},
+				#{item.isEnable},
+				#{item.enableDate},
+				#{item.resource},
+				#{item.delFlag},
+				#{item.createBy},
+				#{item.createTime},
+				#{item.remarks}
+			)
+			</foreach>
+	</insert>
+	
+	<!-- 修改机构 -->
+	<update id="modifyOrganization" parameterType="java.util.List">
+	
+		<foreach collection="list" item="item" index="index" open="" close="" separator=";">
+			update sys_organization
+			<set>
+				<if test="item.parentId != null and item.parentId != ''">
+					parent_id = #{item.parentId},
+				</if>
+				
+				<if test="item.parentIds != null and item.parentIds != ''">
+					parent_ids = #{item.parentIds},
+				</if>
+				
+				<if test="item.code != null and item.code != ''">
+					code = #{item.code},
+				</if>
+				
+				<if test="item.name != null and item.name != ''">
+					name = #{item.name},
+				</if>
+				
+				<if test="item.orgType != null and item.orgType != ''">
+					org_type = #{item.orgType},
+				</if>
+				
+				<if test="item.level != null and item.level != ''">
+					level = #{item.level},
+				</if>
+				
+				<if test="item.address != null and item.address != ''">
+					address = #{item.address},
+				</if>
+				
+				<if test="item.contactPerson != null and item.contactPerson != ''">
+					contact_person = #{item.contactPerson},
+				</if>
+				
+				<if test="item.contactPhone != null and item.contactPhone != ''">
+					contact_phone = #{item.contactPhone},
+				</if>
+				
+				<if test="item.ownZoneCode != null and item.ownZoneCode != ''">
+					own_zone_code = #{item.ownZoneCode},
+				</if>
+				
+				<if test="item.zoneCode != null and item.zoneCode != ''">
+					zone_code = #{item.zoneCode},
+				</if>
+				
+				<if test="item.province != null and item.province != ''">
+					province = #{item.province},
+				</if>
+				
+				<if test="item.provinceCode != null and item.provinceCode != ''">
+					province_code = #{item.provinceCode},
+				</if>
+				
+				<if test="item.city != null and item.city != ''">
+					city = #{item.city},
+				</if>
+				
+				<if test="item.cityCode != null and item.cityCode != ''">
+					city_code = #{item.cityCode},
+				</if>
+				
+				<if test="item.county != null and item.county != ''">
+					county = #{item.county},
+				</if>
+				
+				<if test="item.countyCode != null and item.countyCode != ''">
+					county_code = #{item.countyCode},
+				</if>
+				
+				<if test="item.town != null and item.town != ''">
+					town = #{item.town},
+				</if>
+				
+				<if test="item.townCode != null and item.townCode != ''">
+					town_code = #{item.townCode},
+				</if>
+				
+				<if test="item.isEnable != null and item.isEnable != ''">
+					is_enable = #{item.isEnable},
+				</if>
+				
+				<if test="item.enableDate != null and item.enableDate != ''">
+					enable_date = #{item.enableDate},
+				</if>
+				
+				<if test="item.resource != null and item.resource != ''">
+					resource = #{item.resource},
+				</if>
+				
+				<if test="item.delFlag != null and item.delFlag != ''">
+					del_flag = #{item.delFlag},
+				</if>
+				
+				<if test="item.updateBy != null and item.updateBy != ''">
+					update_by = #{item.updateBy},
+				</if>
+				
+				<if test="item.updateTime != null and item.updateTime != ''">
+					update_time = #{item.updateTime},
+				</if>
+				
+				<if test="item.remarks != null and item.remarks != ''">
+					remarks = #{item.remarks},
+				</if>
+				
+			</set>
+			<where>
+				id = #{item.id}
+			</where>
+		</foreach>
+	</update>
+	
+	<!-- 逻辑删除机构 -->
+	<update id="deleteOrganization" parameterType="java.util.List">
+		<foreach collection="list" item="item" index="index" open="" close="" separator=";">
+			update sys_organization 
+			<set>
+				del_flag = '1',
+				update_by = #{item.updateBy},
+				update_time = #{item.updateTime}
+			</set>
+			<where>
+				id = #{item.id}
+			</where>
+		</foreach>
+	</update>
+	
+	<!-- 物理删除机构 -->
+	<delete id="deleteOrganizationByPhysical" parameterType="java.util.List">
+		delete from sys_organization where id in 
+		<foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+			#{item.id}
+		</foreach>
+	</delete>
+</mapper>

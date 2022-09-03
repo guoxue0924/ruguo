@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tuling.modules.goods.goods.dao.GoodsPriceListDao">
+    
+ 	<sql id="goodsPriceListColumns">
+		a.id AS "id",
+		a.goods_price_code AS "goodsPriceCode",
+		a.goods_code AS "goodsCode",
+		a.goods_type AS "goodsType",
+		a.goods_validity_num AS "goodsValidityNum",
+		a.goods_validity_unit AS "goodsValidityUnit",
+		a.goods_price AS "goodsPrice",
+		a.is_default AS "isDefault",
+		a.create_by AS "createBy.id",
+		a.create_time AS "createTime",
+		a.update_by AS "updateBy.id",
+		a.update_time AS "updateTime",
+		a.remark AS "remark",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<select id="findGoodsPriceListByGoodsCode" resultType="com.tuling.modules.goods.goods.entity.GoodsPriceList" parameterType="Goods">
+		SELECT 
+			<include refid="goodsPriceListColumns"/>
+		FROM goods_price_list a
+		 <where>
+			a.goods_code = #{goodsCode}
+		</where>	
+		AND a.del_flag = #{DEL_FLAG_NORMAL}
+	</select>
+	<select id="get" resultType="com.tuling.modules.goods.goods.entity.GoodsPriceList" parameterType="com.tuling.modules.goods.goods.entity.GoodsPriceList">
+		SELECT 
+			<include refid="goodsPriceListColumns"/>
+		FROM goods_price_list a
+		 <where>
+			a.goods_price_code = #{goodsPriceCode}
+		</where>	
+		AND a.del_flag = #{DEL_FLAG_NORMAL}
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO goods_price_list(
+			id,
+			goods_price_code,
+			goods_code,
+			goods_type,
+			goods_validity_num,
+			goods_validity_unit,
+			goods_price,
+			is_default,
+			create_by,
+			create_time,
+			update_by,
+			update_time,
+			remark,
+			del_flag
+		) VALUES (
+			#{id},
+			#{goodsPriceCode},
+			#{goodsCode},
+			#{goodsType},
+			#{goodsValidityNum},
+			#{goodsValidityUnit},
+			#{goodsPrice},
+			#{isDefault},
+			#{createBy.id},
+			#{createTime},
+			#{updateBy.id},
+			#{updateTime},
+			#{remark},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE goods_price_list SET 	
+			goods_validity_num = #{goodsValidityNum},
+			goods_price = #{goodsPrice},
+			
+			update_by = #{updateBy.id},
+			update_time = #{updateTime},
+			remark = #{remark},
+			del_flag = #{delFlag}
+		WHERE id = #{id}
+	</update>
+	<delete id="delete">
+		DELETE FROM goods_price_list 
+		<where>
+			goods_code = #{goodsCode}
+		</where>
+	</delete>
+	
+	
+</mapper>

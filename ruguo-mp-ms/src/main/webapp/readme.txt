@@ -1,0 +1,27 @@
+
+images-------系统公共图片
+modules------系统业务模块js
+	common---系统公共
+	demo-----样例模块
+	login----登陆模块
+	sys------系统管理模块
+	...
+plugins------系统支撑插件
+static-------静态文件（将取消）
+userfiles----用户文件
+WEB-INF
+	tlds-----tlds扩展文件
+	views----JSP
+		error------系统异常jsp
+		include----（将取消）
+		layout-----tiles布局文件
+		layouts----（将取消）
+		mobile-----移动端jsp
+		modules----系统业务模块jsp
+			demo-----样例模块
+			gen------代码生成模块
+			sys------系统管理模块
+			...
+		nfpc---------业务管理模块（迁移至WEB-INF/views/modules/）
+	tiles.xml----模板配置文件
+	web.xml

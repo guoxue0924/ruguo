@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tuling.modules.goods.goods.dao.GoodsTagsListDao">
+    
+ 	<sql id="goodsTagListColumns">
+		a.id AS "id",
+		a.goods_code AS "goodsCode",
+		a.tag_code AS "tagCode",
+		a.tag_name AS "tagName",
+		a.tag_type AS "tagType",
+		a.data_element_code AS "dataElementCode",
+		a.data_element_value AS "dataElementValue",
+		a.create_by AS "createBy.id",
+		a.create_time AS "createTime",
+		a.update_by AS "updateBy.id",
+		a.update_time AS "updateTime",
+		a.remark AS "remark",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	
+	
+	<insert id="insert">
+		INSERT INTO goods_tag_list(
+			id,
+			goods_code,
+			tag_code,
+			tag_name,
+			tag_type,
+			data_element_code,
+			data_element_value,
+			create_by,
+			create_time,
+			update_by,
+			update_time,
+			remark,
+			del_flag
+		) VALUES (
+			#{id},
+			#{goodsCode},
+			#{tagCode},
+			#{tagName},
+			#{tagType},
+			#{dataElementCode},
+			#{dataElementValue},
+			#{createBy.id},
+			#{createTime},
+			#{updateBy.id},
+			#{updateTime},
+			#{remark},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE goods_tag_list SET 	
+			goods_code = #{goodsCode},
+			goods_pic_url = #{goodsPicUrl},
+			goods_pic_seq = #{goodsPicSeq},
+			update_by = #{updateBy.id},
+			update_time = now(),
+			remark = #{remark},
+			del_flag = #{delFlag}
+		WHERE id = #{id}
+	</update>
+	
+	<select id="getTagsByGoodsCode" resultType="com.tuling.modules.goods.goods.entity.GoodsTagsList" >
+		SELECT 
+			<include refid="goodsTagListColumns"/>
+		FROM goods_tag_list a
+		 <where>
+			a.goods_code = #{goodsCode}
+		</where>		
+		AND a.del_flag = #{DEL_FLAG_NORMAL}
+	</select>
+	<delete id="delete" parameterType="com.tuling.modules.goods.goods.entity.GoodsTagsList">
+		DELETE FROM goods_tag_list 
+		<where>
+			goods_code = #{goodsCode}
+		</where>
+	</delete>
+	
+	
+</mapper>

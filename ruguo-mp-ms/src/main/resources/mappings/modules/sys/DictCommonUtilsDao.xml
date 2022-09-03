@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.foundation.modules.sys.dao.DictCommonUtilsDao">
+
+    <!-- 分页查询信息 -->
+    <select id="selectSql" resultType="map">
+        ${sqlString}
+    </select>
+
+    <!-- 查询当前时间 -->
+    <select id="getCurrentDate" resultType="com.foundation.modules.sys.entity.SqlEntity">
+        select now() as "currentDate" from dual;
+    </select>
+
+    <!-- 插入信息 -->
+    <insert id="insertSql" >
+        ${sqlString}
+    </insert>
+
+    <!-- 更新信息 -->
+    <update id="updateSql" >
+        ${sqlString}
+    </update>
+
+    <!-- 删除信息 -->
+    <delete id="deleteSql" >
+        ${sqlString}
+    </delete>
+
+</mapper>

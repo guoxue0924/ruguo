@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tuling.modules.order.orderquery.dao.OrderGoodsQueryDao">
+    <!-- 查询订单商品表的字段 -->
+	<sql id="orderGoodsColumns">
+		 a.id AS "id",
+		 a.order_code AS "orderCode",					
+		 a.goods_code AS "goodsCode",									
+		 a.goods_name AS "goodsName",							
+		 a.goods_type AS "goodsType",									
+		 ifnull(a.goods_price,0) * ifnull(a.goods_uint_num,0) AS "goodsPrice",									
+		 ifnull(a.goods_discount_price,0) * ifnull(a.goods_uint_num,0) AS "goodsDiscountPrice",								
+		 a.goods_uint_num AS "goodsUintNum",									
+								
+									
+		 a.create_time AS "createTime",				 					
+		 a.create_by AS "createBy",										
+		 a.update_time AS "updateTime",				 					
+		 a.update_by AS "updateBy",				 						
+		 a.del_flag AS "delFlag",				 						
+		 a.remark AS "remark"					
+	</sql>
+	
+	<!-- 通过订单编号查询订单商品表的数据 -->
+	<select id="getOrderGoodsList" parameterType="OrderFilter" resultType="OrderGoods">
+		SELECT 
+			<include refid="orderGoodsColumns"/>
+		FROM order_goods_list a
+		<where>
+			a.order_code = #{orderCode}
+			AND a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_time DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	
+</mapper>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.foundation.modules.sys.dao.ComSequenceDao">
+	<select id="getComSequence" parameterType="java.lang.String" resultType="java.lang.String">
+    select 
+      CURRENT_VAL
+    from SYS_SEQUENCE
+    where SEQ_NAME = #{seqName,jdbcType=VARCHAR}
+  </select>
+  <insert id="insert" parameterType="com.foundation.modules.sys.entity.ComSequence">
+    insert into SYS_SEQUENCE (
+      SEQ_NAME, 
+      CURRENT_VAL, 
+      INCREMENT_VAL
+      )
+    values (
+      #{seqName,jdbcType=VARCHAR},
+      #{currentVal,jdbcType=INTEGER},
+      #{incrementVal,jdbcType=INTEGER}
+      )
+  </insert>
+  <update id="lockComSequence" parameterType="com.foundation.modules.sys.entity.ComSequence">
+        UPDATE SYS_SEQUENCE t SET T.CURRENT_VAL = T.CURRENT_VAL
+        WHERE T.SEQ_NAME = #{seqName,jdbcType=VARCHAR}
+  </update>
+  <update id="nextComSequence" parameterType="com.foundation.modules.sys.entity.ComSequence">
+        UPDATE SYS_SEQUENCE t SET T.CURRENT_VAL = T.CURRENT_VAL + T.INCREMENT_VAL
+        WHERE T.SEQ_NAME = #{seqName,jdbcType=VARCHAR}
+  </update>
+</mapper>

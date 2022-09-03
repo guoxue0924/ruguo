@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tuling.modules.goods.goods.dao.GoodsPicListDao">
+    
+ 	<sql id="goodsPicListColumns">
+		a.id AS "id",
+		a.goods_code AS "goodsCode",
+		a.goods_pic_url AS "goodsPicUrl",
+		a.goods_pic_seq AS "goodsPicSeq",
+		a.create_by AS "createBy.id",
+		a.create_time AS "createTime",
+		a.update_by AS "updateBy.id",
+		a.update_time AS "updateTime",
+		a.remark AS "remark",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="goodsPicListJoins">
+	</sql> 
+    
+	
+	
+	<insert id="insert">
+		INSERT INTO goods_pic_list(
+			id,
+			goods_code,
+			goods_pic_url,
+			goods_pic_seq,
+			create_by,
+			create_time,
+			update_by,
+			update_time,
+			remark,
+			del_flag
+		) VALUES (
+			#{id},
+			#{goodsCode},
+			#{goodsPicUrl},
+			#{goodsPicSeq},
+			#{createBy.id},
+			#{createTime},
+			#{updateBy.id},
+			#{updateTime},
+			#{remark},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE goods_pic_list SET 	
+			goods_code = #{goodsCode},
+			goods_pic_url = #{goodsPicUrl},
+			goods_pic_seq = #{goodsPicSeq},
+			update_by = #{updateBy.id},
+			update_time = now(),
+			remark = #{remark},
+			del_flag = #{delFlag}
+		WHERE id = #{id}
+	</update>
+	
+	<select id="findGoodsLogo" resultType="GoodsPicList" parameterType="Goods">
+		SELECT 
+			<include refid="goodsPicListColumns"/>
+		FROM goods_pic_list a
+		<include refid="goodsPicListJoins"/>
+		 <where>
+			a.goods_code = #{goodsCode}
+		</where>	
+		AND a.del_flag = #{DEL_FLAG_NORMAL}
+	</select>
+	
+	<select id="findAllGoodsPicList" resultType="GoodsPicList" parameterType="Goods">
+		SELECT 
+			<include refid="goodsPicListColumns"/>
+		FROM goods_pic_list a
+		<include refid="goodsPicListJoins"/>
+		 <where>
+			a.goods_code = #{goodsCode}
+		</where>		
+		AND a.del_flag = #{DEL_FLAG_NORMAL}
+	</select>
+	
+	<delete id="deleteGoodsPicListByGoodsId">
+		DELETE FROM goods_pic_list 
+		<where>
+			goods_pic_id = #{id}
+		</where>
+	</delete>
+	
+	<delete id="deletePicByGoodsCode" parameterType="Goods">
+		DELETE FROM goods_pic_list 
+		<where>
+			goods_code = #{goodsCode}
+		</where>
+	</delete>
+	
+	<delete id="delete">
+		DELETE FROM goods_pic_list 
+		<where>
+			id = #{id}
+		</where>
+	</delete>
+	
+</mapper>

@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.foundation.modules.datasync.user.dao.UserExtSyncDao">
+	<!-- 创建账号 -->
+	<insert id="insertUser" parameterType="java.util.List">
+		INSERT INTO sys_user_info (
+			id,
+			login_name,
+  			certificate_type,
+			certificate_no,
+			gender,
+			birthday,
+			educate_grade,
+			position_title,
+			telephone,
+			mobile_phone,
+			email,
+			wechat,
+			qq,
+			department,
+			address,
+			create_by,
+			create_time,
+			update_by,
+			update_time,
+			del_flag,
+			remarks,
+			other_dept,
+			other_prof,
+			unit_name
+		) VALUES 
+		<foreach collection="list" item="item" index="index" separator=",">
+		(
+			#{item.id},
+			#{item.loginName},
+  			#{item.certificateType},
+			#{item.certificateNo},
+			#{item.gender},
+			#{item.birthday},
+			#{item.educateGrade},
+			#{item.positionTitle},
+			#{item.telephone},
+			#{item.mobilePhone},
+			#{item.email},
+			#{item.wechat},
+			#{item.qq},
+			#{item.department},
+			#{item.address},
+			#{item.createBy},
+			#{item.createTime},
+			#{item.updateBy},
+			#{item.updateTime},
+			#{item.delFlag},
+			#{item.remarks},
+			#{item.otherDept},
+			#{item.otherProf},
+			#{item.unitName}
+		)
+		</foreach>
+	</insert>
+	
+	<!-- 修改账号 -->
+	<update id="updateUser" parameterType="java.util.List">
+		<foreach collection="list" item="item" index="index" open="" close="" separator=";">
+			UPDATE sys_user_info 
+			<set>
+				<if test="item.loginName != null and item.loginName != ''"> 	
+					login_name = #{item.loginName},
+				</if>
+				<if test="item.certificateType != null and item.certificateType != ''">
+	  				certificate_type = #{item.certificateType},
+	  			</if>
+	  			<if test="item.certificateNo != null and item.certificateNo != ''">
+					certificate_no = #{item.certificateNo},
+				</if>
+				<if test="item.gender != null and item.gender != ''">
+					gender = #{item.gender},
+				</if>
+				<if test="item.birthday != null and item.birthday != ''">
+					birthday = #{item.birthday},
+				</if>
+				<if test="item.educateGrade != null and item.educateGrade != ''">
+					educate_grade = #{item.educateGrade},
+				</if>
+				<if test="item.positionTitle != null and item.positionTitle != ''">
+					position_title = #{item.positionTitle},
+				</if>
+				<if test="item.telephone != null and item.telephone != ''">
+					telephone = #{item.telephone},
+				</if>
+				<if test="item.mobilePhone != null and item.mobilePhone != ''">
+					mobile_phone = #{item.mobilePhone},
+				</if>
+				<if test="item.email != null and item.email != ''">
+					email = #{item.email},
+				</if>
+				<if test="item.wechat != null and item.wechat != ''">
+					wechat = #{item.wechat},
+				</if>
+				<if test="item.qq != null and item.qq != ''">
+					qq = #{item.qq},
+				</if>
+				<if test="item.department != null and item.department != ''">
+					department = #{item.department},
+				</if>
+				<if test="item.address != null and item.address != ''">
+					address = #{item.address},
+				</if>
+				<if test="item.createBy != null and item.createBy != ''">
+					create_by = #{item.createBy},
+				</if>
+				<if test="item.createTime != null and item.createTime != ''">
+					create_time = #{item.createTime},
+				</if>
+				<if test="item.updateBy != null and item.updateBy != ''">
+					update_by = #{item.updateBy},
+				</if>
+				<if test="item.updateTime != null and item.updateTime != ''">
+					update_time = #{item.updateTime},
+				</if>
+				<if test="item.delFlag != null and item.delFlag != ''">
+					del_flag = #{item.delFlag},
+				</if>
+				<if test="item.remarks != null and item.remarks != ''">
+					remarks = #{item.remarks},
+				</if>
+				<if test="item.otherDept != null and item.otherDept != ''">
+					other_dept = #{item.otherDept},
+				</if>
+				<if test="item.otherProf != null and item.otherProf != ''">
+					other_prof = #{item.otherProf},
+				</if>
+				<if test="item.unitName != null and item.unitName != ''">
+					unit_name = #{item.unitName},
+				</if>
+			</set>
+			<where>
+				id = #{item.id}
+			</where>
+		</foreach>
+	</update>
+	
+	<!-- 逻辑删除 -->
+	<update id="logicDeleteUser" parameterType="java.util.List">
+		<foreach collection="list" item="item" index="index" open="" close="" separator=";">
+			UPDATE sys_user_info 
+			<set>
+				del_flag = '1',
+				update_by = #{item.updateBy},
+				update_time = #{item.updateTime}
+			</set>
+			<where>
+				id = #{item.id}
+			</where>
+		</foreach>	
+	</update>
+	
+	<!-- 物理删除 -->
+	<delete id="physicsDeleteUser" parameterType="java.util.List">
+        DELETE FROM sys_user_info where id in
+        <foreach collection="list" item="item" index="index" open="(" separator="," close=")">
+            #{item.id}
+        </foreach>
+    </delete>
+	
+</mapper>

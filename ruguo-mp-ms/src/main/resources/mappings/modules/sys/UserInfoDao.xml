@@ -1,0 +1,386 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.foundation.modules.sys.dao.UserInfoDao">
+    
+    
+	<sql id="userColumns">
+		a.id AS "id",
+		a.login_name AS "loginName",
+		a.certificate_type AS "certificateType",
+		a.certificate_no AS "certificateNo",
+		a.gender AS "gender",
+		a.birthday AS "birthday",
+		a.telephone AS "telephone",
+		a.mobile_phone AS "mobilePhone",
+		a.email AS "email",
+		a.wechat AS "wechat",
+		a.qq AS "qq",
+		a.address AS "address",
+		b.create_by as "userInfoCreateBy.id",
+		b.create_time as "userInfoCreateTime",
+		b.update_by as "userInfoUpdateBy.id",
+		b.update_time as "userInfoUpdateTime",
+		b.remark as "userInfoRemark",
+		b.del_flag as "userInfoDelFlag",
+		
+		<!-- by liuhuan at 20170513 增加单位名称 start -->
+		a.unit_name AS "unitName",
+		<!-- by liuhuan at 20170513 增加单位名称 end -->
+		<!-- by liuhuan at 20170508 增加联系方式拼串 start -->
+		TRIM(BOTH  '/' FROM concat(IFNULL(a.mobile_phone,''),'/',IFNULL(a.telephone,''))) AS contactWay,
+		<!-- by liuhuan at 20170508 增加联系方式拼串 end -->
+<!-- 		b.id as "sysUserId", -->
+<!-- 		b.login_name as "sysLoginName", -->
+		b.password as "password",
+		b.name as "name",
+<!-- 		b.email as "sysEmail", -->
+<!-- 		b.phone as "phone", -->
+<!-- 		b.mobile as "mobile", -->
+		b.enable_date AS "enableDate",
+		b.login_num AS "loginNum",
+		b.login_date AS "loginDate",
+		b.login_ip AS "loginIp",
+		b.pwd_last_settime AS "pwdLastSettime",
+		b.pwd_expired_time AS "pwdExpiredTime",
+		b.is_reset_pwd AS "isResetPwd",
+<!-- 		b.photo as "photo", -->
+<!-- 		b.login_ip as "sysLoginIp", -->
+<!-- 		b.login_date as "sysLoginDate", -->
+		b.login_flag as "loginFlag",
+		b.token as "token",
+		a.create_by AS "createBy.id",
+		a.create_time AS "createTime",
+		a.update_by AS "updateBy.id",
+		a.update_time AS "updateTime",
+		a.del_flag AS "delFlag", 
+		a.remark AS "remark"
+	</sql>
+	
+	<sql id="userRole">
+		r.role_id AS userRole,
+		sr.name AS userRoleName
+	</sql>
+	
+	<sql id="umUserJoins">
+	</sql>
+    
+	<select id="getUserList" resultType="User">
+		SELECT 
+			<include refid="userRole"/>,
+			<include refid="userColumns"/>
+		FROM sys_user_info a,sys_user b
+			 left join sys_user_role r ON r.user_id = b.id
+			 left join sys_role sr ON sr.id = r.role_id
+		<include refid="umUserJoins"/>
+		<where>
+			a.del_flag = '0' and 
+			b.del_flag = '0' and 
+			a.id = b.id  
+			<if test="name != null and name != ''">
+				AND b.name LIKE CONCAT('%','${name}','%')
+			</if>
+			<if test="certificateNo != null and certificateNo != ''">
+				AND a.certificate_no LIKE CONCAT('%','${certificateNo}','%')
+			</if>
+			<if test="birthday != null and birthday != ''">
+				AND a.birthday = #{birthday}
+			</if>
+			<if test="mobilePhone != null and mobilePhone != ''"> 
+				AND a.mobile_phone LIKE CONCAT('%','${mobilePhone}','%')
+			</if>
+			<if test="telephone != null and telephone != ''">
+				AND a.telephone LIKE CONCAT('%','${telephone}','%')
+			</if>
+			<if test="loginFlag != null and loginFlag != ''">
+				AND b.login_flag = #{loginFlag}
+			</if> 
+			<if test="userRole != null and userRole != ''">
+				AND r.role_id = #{userRole}
+			</if>
+			<if test="loginName != null and loginName != ''">
+				AND a.login_name LIKE CONCAT('%','${loginName}','%')
+			</if>
+			<if test="id != null and id != ''">
+				AND b.id = #{id}
+			</if> 
+		</where>
+		ORDER BY b.update_time DESC
+	</select>
+	
+	<select id="getUserListByLoginName" resultType="User">
+		SELECT 
+			<include refid="userRole"/>,
+			<include refid="userColumns"/>
+		FROM sys_user_info a,sys_user b
+			 left join sys_user_role r ON r.user_id = b.id
+			 left join sys_role sr ON sr.id = r.role_id
+		<include refid="umUserJoins"/>
+		<where>
+			a.del_flag = '0' and 
+			b.del_flag = '0' and 
+			a.id = b.id  
+			<if test="name != null and name != ''">
+				AND b.login_name = #{loginName}
+			</if>
+		</where>
+	</select>
+	
+<!-- 	<select id="findList" resultType="User"> -->
+<!-- 		SELECT  -->
+<!-- 			<include refid="userColumns"/> -->
+<!-- 		FROM sys_user_info a -->
+<!-- 		<include refid="umUserJoins"/> -->
+<!-- 		<where> -->
+<!-- 			a.del_flag = #{DEL_FLAG_NORMAL} -->
+<!-- 			<if test="name != null and name != ''"> -->
+<!-- 				AND a.name LIKE  -->
+<!-- 					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if> -->
+<!-- 					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if> -->
+<!-- 					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if> -->
+<!-- 			</if> -->
+<!-- 		</where> -->
+<!-- 		<choose> -->
+<!-- 			<when test="page !=null and page.orderBy != null and page.orderBy != ''"> -->
+<!-- 				ORDER BY ${page.orderBy} -->
+<!-- 			</when> -->
+<!-- 			<otherwise> -->
+<!-- 				ORDER BY a.update_date DESC -->
+<!-- 			</otherwise> -->
+<!-- 		</choose> -->
+<!-- 	</select> -->
+	
+	<select id="findAllList" resultType="User">
+		SELECT 
+			<include refid="userColumns"/>
+		FROM sys_user_info a
+		<include refid="umUserJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_time DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO sys_user_info(
+			id,
+			login_name,
+			certificate_type,
+			certificate_no,
+			gender,
+			birthday,
+			telephone,
+			mobile_phone,
+			email,
+			wechat,
+			qq,
+			address,
+			create_by,
+			create_time,
+			update_by,
+			update_time,
+			del_flag,
+			remark
+		) VALUES (
+			#{id},
+			#{loginName},
+			#{certificateType},
+			#{certificateNo},
+			#{gender},
+			#{birthday},
+			#{telephone},
+			#{mobilePhone},
+			#{email},
+			#{wechat},
+			#{qq},
+			#{address},
+			#{createBy.id},
+			#{createTime},
+			#{updateBy.id},
+			#{updateTime},
+			#{delFlag},
+			#{remark}
+		)
+	</insert>
+	
+<!-- 	<insert id="insertSysUser"> -->
+<!-- 		INSERT INTO sys_user( -->
+<!-- 			id, -->
+<!-- 			login_name, -->
+<!-- 			password, -->
+<!-- 			name, -->
+<!-- 			email, -->
+<!-- 			phone, -->
+<!-- 			mobile, -->
+<!-- 			photo, -->
+<!-- 			login_ip, -->
+<!-- 			login_date, -->
+<!-- 			org_id, -->
+<!-- 			login_flag, -->
+<!-- 			token, -->
+<!-- 			del_flag, -->
+<!-- 			create_by, -->
+<!-- 			create_date, -->
+<!-- 			update_by, -->
+<!-- 			update_date, -->
+<!-- 			remarks -->
+<!-- 		) VALUES ( -->
+<!-- 			#{id}, -->
+<!-- 			#{loginName}, -->
+<!-- 			#{password}, -->
+<!-- 			#{sysName}, -->
+<!-- 			#{sysEmail}, -->
+<!-- 			#{phone}, -->
+<!-- 			#{mobile}, -->
+<!-- 			#{userType}, -->
+<!-- 			#{photo}, -->
+<!-- 			#{sysLoginIp}, -->
+<!-- 			#{sysLoginDate}, -->
+<!-- 			#{sysOrgId}, -->
+<!-- 			#{sysLoginFlag}, -->
+<!-- 			#{token}, -->
+<!-- 			#{delFlag}, -->
+<!-- 			#{createBy.id}, -->
+<!-- 			#{createDate}, -->
+<!-- 			#{updateBy.id}, -->
+<!-- 			#{updateDate}, -->
+<!-- 			#{remarks} -->
+<!-- 		) -->
+<!-- 	</insert> -->
+	
+	<!-- 更新用户信息 -->
+    <update id="update" >
+        UPDATE sys_user_info t
+        <set>
+            <if test="loginName != null">
+                t.login_name = #{loginName},
+            </if>
+<!--             <if test="certificateType != null"> -->
+<!--                 t.certificate_type = #{certificateType}, -->
+<!--             </if> -->
+<!--             <if test="certificateNo != null"> -->
+<!--                 t.certificate_no = #{certificateNo}, -->
+<!--             </if> -->
+            <if test="gender != null">
+                t.gender = #{gender},
+            </if>
+            <if test="birthday != null">
+                t.birthday = #{birthday},
+            </if>
+            t.telephone = #{telephone},	
+            t.mobile_phone = #{mobilePhone},
+            <if test="email != null">
+                t.email = #{email},
+            </if>
+             t.wechat = #{wechat},
+             t.qq = #{qq},
+            <if test="address != null">
+                t.address = #{address},
+            </if>       
+            t.unit_name = #{unitName},	
+           <!--  <if test="createBy != null">
+                t.create_by = #{createBy.id},
+            </if>
+            <if test="createDate != null">
+                t.create_date = #{createDate},
+            </if> -->
+            <if test="updateBy != null">
+                t.update_by = #{updateBy.id},
+            </if>
+            <if test="updateTime != null">
+                t.update_time = #{updateTime},
+            </if>
+            <if test="delFlag != null">
+                t.del_flag = #{delFlag},
+            </if>
+        </set>
+        <where>
+            t.id = #{id}
+        </where>
+    </update>
+	
+	<update id="deleteUmUser">
+		UPDATE sys_user_info SET 
+			del_flag = '1',
+			update_by = #{updateBy.id},
+			update_time = #{updateTime}
+		WHERE id = #{id}
+	</update>
+	<update id="deleteSysUser">
+		UPDATE sys_user SET 
+			del_flag = '1',
+			update_by = #{updateBy.id},
+			update_time = #{updateTime}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="whetherLoginFlag">
+		UPDATE sys_user SET 
+			login_flag = #{loginFlag},
+			update_by = #{updateBy.id},
+			update_time = #{updateTime}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="updatePassword">
+		UPDATE sys_user SET 
+			password = #{password},
+			is_reset_pwd = 1,
+			update_by = #{updateBy.id},
+			update_time = #{updateTime}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="updateReset">
+		UPDATE sys_user_info SET 
+			is_reset_pwd = 1
+		WHERE id = #{id}
+	</update>
+	
+	<select id="findByLoginName" resultType="User">
+		SELECT 
+			*
+		FROM sys_user_info a
+		<include refid="umUserJoins"/>
+		WHERE a.login_name = #{loginName}
+	</select>
+	
+	<select id="findBySysLoginName" resultType="User">
+		SELECT 
+			*
+		FROM sys_user a
+		<include refid="umUserJoins"/>
+		WHERE a.login_name = #{loginName}
+	</select>
+	
+	
+	<!-- <update id="updateOrgId">
+		UPDATE sys_user SET 
+			login_flag = #{loginFlag}
+		WHERE org_id = #{orgId}
+	</update> -->
+	
+	
+	<insert id="insertSysUserRole">
+		INSERT INTO sys_user_role(
+			user_id,
+			role_id
+		) VALUES (
+			#{id},
+			#{roleId}
+		)
+	</insert>
+	
+	<update id="updateRoleId">
+		UPDATE sys_user_role SET 
+			role_id = #{roleId}
+		WHERE user_id = #{id}
+	</update>
+	
+</mapper>

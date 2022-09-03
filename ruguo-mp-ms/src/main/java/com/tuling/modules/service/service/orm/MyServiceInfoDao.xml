@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tuling.modules.service.service.dao.MyServicesDao">
+    <!-- 查询订单表的字段 -->
+	<sql id="myServicesColumns">
+		 a.service_code AS "serviceCode",					
+		 a.member_code AS "memberCode",									
+		 a.order_code AS "orderCode",							
+		 a.product_code AS "productCode",									
+		 a.product_name AS "productName",									
+		 a.goods_code AS "goodsCode",								
+		 a.goods_name AS "goodsName",									
+		 a.rela_per_code AS "relaPerCode",									
+		 a.execute_status AS "executeStatus",										
+		 a.service_cycle AS "serviceCycle",						
+		 DATE_FORMAT(a.service_start_time, '%Y-%m-%d %H:%i:%s') AS "serviceStartTime",						
+		 DATE_FORMAT(a.service_end_time, '%Y-%m-%d %H:%i:%s') AS "serviceEndTime",								
+		 a.create_time  AS "createTime",			 					
+		 a.create_by AS "createBy",	
+		 a.create_by_name AS "createByName",										
+		 a.update_time  AS "updateTime",		 					
+		 a.update_by AS "updateBy",	
+		 a.update_by_name AS "updateByName",				 						
+		 a.del_flag AS "delFlag",				 						
+		 a.remark AS "remark"					
+	</sql>
+	
+	<!-- 查询服务表的数据 -->
+	<select id="getServiceList" parameterType="com.tuling.modules.service.service.entity.MyServiceInfoParameter" resultType="com.tuling.modules.service.service.entity.MyServiceInfoFilter">
+		SELECT 
+		b.goods_title AS "goodsTitle",
+    	c.`name` AS "memberName",
+    	c.gender_name AS "genderName",
+		d.rela_per_gender_name AS "relaPerGenderName",
+		d.rela_per_name AS "relaPerName",
+		d.rela_per_mobile_phone AS "relaPerMobilePhone",
+		c.mobile_phone AS "mobilePhone",
+			<include refid="myServicesColumns"/>
+		FROM goods_basic_info b,member_basic_info c,my_service_info a 
+		    LEFT JOIN member_relationship_info d ON a.rela_per_code = d.rela_per_code
+		<where>
+			a.goods_code = b.goods_code
+			AND a.member_code = c.`code`
+			
+			<if test="memberName != null and memberName != ''">
+					AND c.`name` LIKE 
+			    <if test="dbName == 'oracle'">'%'||#{memberName}||'%'</if>
+			    <if test="dbName == 'mssql'">'%'+#{memberName}+'%'</if>
+			    <if test="dbName == 'mysql'">concat('%',#{memberName},'%')</if> 
+			</if>
+			<if test="relaPerName != null and relaPerName != ''">
+					AND d.rela_per_name LIKE 
+			    <if test="dbName == 'oracle'">'%'||#{relaPerName}||'%'</if>
+			    <if test="dbName == 'mssql'">'%'+#{relaPerName}+'%'</if>
+			    <if test="dbName == 'mysql'">concat('%',#{relaPerName},'%')</if> 
+			</if>
+			<if test="disServiceEndTime != null and disServiceEndTime != ''">
+            <![CDATA[
+            	  AND DATE_FORMAT(a.service_end_time, '%Y-%m-%d') >=  DATE_FORMAT(now(), '%Y-%m-%d')
+                  AND DATE_FORMAT(a.service_end_time, '%Y-%m-%d') <=  DATE_FORMAT(#{disServiceEndTime}, '%Y-%m-%d')
+            ]]>
+	        </if>
+			<if test="startTime != null and startTime != ''">
+            <![CDATA[
+                  AND DATE_FORMAT(a.service_start_time, '%Y-%m-%d') >=  DATE_FORMAT(#{startTime}, '%Y-%m-%d')
+            ]]>
+	        </if>
+	        <if test="endTime != null and endTime != ''">
+            <![CDATA[
+                  AND DATE_FORMAT(a.service_start_time, '%Y-%m-%d') <=  DATE_FORMAT(#{endTime}, '%Y-%m-%d')
+            ]]>
+	        </if>
+		</where>
+		and a.del_flag = '0'
+		group by a.service_start_time
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_time DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<!-- 查询服务表的数据 -->
+	<select id="getServiceListT" parameterType="com.tuling.modules.service.service.entity.MyServiceInfoParameter" resultType="com.tuling.modules.service.service.entity.MyServiceInfoFilter">
+		SELECT 
+		b.goods_title AS "goodsTitle",
+    	c.`name` AS "memberName",
+    	c.gender_name AS "genderName",
+		d.rela_per_gender_name AS "relaPerGenderName",
+		d.rela_per_name AS "relaPerName",
+		d.rela_per_mobile_phone AS "relaPerMobilePhone",
+		c.mobile_phone AS "mobilePhone",
+			<include refid="myServicesColumns"/>
+		FROM goods_basic_info b,member_basic_info c,my_service_info a 
+		    LEFT JOIN member_relationship_info d ON a.rela_per_code = d.rela_per_code
+		<where>
+			a.goods_code = b.goods_code
+			AND a.member_code = c.`code`
+			
+			<if test="memberName != null and memberName != ''">
+					AND c.`name` LIKE 
+			    <if test="dbName == 'oracle'">'%'||#{relaPerName}||'%'</if>
+			    <if test="dbName == 'mssql'">'%'+#{relaPerName}+'%'</if>
+			    <if test="dbName == 'mysql'">concat('%',#{relaPerName},'%')</if>  
+			</if>
+			<if test="relaPerName != null and relaPerName != ''">
+					AND d.rela_per_name IS NULL 
+			</if>
+			<if test="disServiceEndTime != null and disServiceEndTime != ''">
+            <![CDATA[
+            	  AND DATE_FORMAT(a.service_end_time, '%Y-%m-%d') >=  DATE_FORMAT(now(), '%Y-%m-%d')
+                  AND DATE_FORMAT(a.service_end_time, '%Y-%m-%d') <=  DATE_FORMAT(#{disServiceEndTime}, '%Y-%m-%d')
+            ]]>
+	        </if>
+			<if test="startTime != null and startTime != ''">
+            <![CDATA[
+                  AND DATE_FORMAT(a.service_start_time, '%Y-%m-%d') >=  DATE_FORMAT(#{startTime}, '%Y-%m-%d')
+            ]]>
+	        </if>
+	        <if test="endTime != null and endTime != ''">
+            <![CDATA[
+                  AND DATE_FORMAT(a.service_start_time, '%Y-%m-%d') <=  DATE_FORMAT(#{endTime}, '%Y-%m-%d')
+            ]]>
+	        </if>
+		</where>
+		and a.del_flag = '0'
+		group by a.service_start_time
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_time DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	
+	<select id="getMyServiceInfoDetail" parameterType="com.tuling.modules.service.service.entity.MyServiceInfoFilter" resultType="com.tuling.modules.service.service.entity.MyServiceInfoFilter">
+		SELECT 
+		b.goods_title AS "goodsTitle",
+    	c.`name` AS "memberName",
+		c.gender_name AS "genderName",
+		d.rela_per_gender_name AS "relaPerGenderName",
+		d.rela_per_name AS "relaPerName",
+		d.rela_per_mobile_phone AS "relaPerMobilePhone",
+		c.mobile_phone AS "mobilePhone",
+			<include refid="myServicesColumns"/>
+		FROM goods_basic_info b,member_basic_info c,my_service_info a 
+		    LEFT JOIN member_relationship_info d ON a.rela_per_code = d.rela_per_code
+		<where>
+			a.goods_code = b.goods_code
+			AND a.member_code = c.`code`
+			AND a.service_code = #{serviceCode}
+		</where>
+		and a.del_flag = '0'
+		
+	</select>
+	
+	
+	
+	
+</mapper>

@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tuling.modules.member.memberquery.dao.MemberBasicInfoDao">
+
+    <sql id="memberBasicInfoColumns">
+		a.id AS "memberBasicInfo.id",
+		a.code AS "memberBasicInfo.code",
+		a.mobile_phone AS "memberBasicInfo.mobilePhone",	
+	    a.member_level_code AS "memberBasicInfo.memberLevelCode",
+		a.create_by AS "memberBasicInfo.createBy.id",
+		a.create_time AS "memberBasicInfo.createTime",
+		a.update_by AS "memberBasicInfo.updateBy.id",
+		a.update_time AS "memberBasicInfo.updateTime",
+		a.remark AS "memberBasicInfo.remark",
+		a.del_flag AS "memberBasicInfo.delFlag"
+	
+	</sql>
+	
+	<sql id="memberRelationshipInfoResult">	
+		  member_code AS "memberCode",	
+		rela_per_name AS "relaPerName",
+		rela_per_gender_name AS "relaPerGenderName",
+		rela_per_birthday AS "relaPerBirthday",		
+		rela_per_certificate_type AS "relaPerCertificateType",
+		rela_per_certificate_name AS "relaPerCertificateName",
+		rela_per_certificate_no AS "relaPerCertificateNo",
+		rela_per_mobile_phone AS "relaPerMobilePhone",
+		create_time AS "createTime"
+	
+	</sql>
+	 
+	<sql id="memberBasicInfoJoins">
+        LEFT JOIN member_level_info mli on mli.member_level_code = a.member_level_code AND mli.del_flag = #{DEL_FLAG_NORMAL}
+    </sql>
+    
+    <sql id="memberRelationshipInfo">
+        LEFT JOIN member_relationship_info mri on mri.member_code = a.code AND mri.del_flag = #{DEL_FLAG_NORMAL} 
+    </sql>
+    
+     
+    <sql id="memberBasicMonetaryInfoJoins">
+	    LEFT JOIN order_goods_list ogl1 ON ogl1.order_code = o1.order_code 
+    </sql>
+	 
+
+	
+	<select id="queryMemberBasicInfoResultByCode" parameterType="MemberRelationshipInfo" resultType="MemberBasicInfoResult">
+		 SELECT 
+		<include refid="memberRelationshipInfoResult"/>
+		 FROM member_relationship_info 	
+			
+		 <where>
+			 del_flag = #{DEL_FLAG_NORMAL} 
+			and member_code=rela_per_code
+			 and member_code= #{memberCode}
+		</where>
+	</select>
+	<select id="getMemberLevelCode"  resultType="MemberBasicInfoResult">
+		 SELECT 
+		member_level_code AS "memberBasicInfo.memberLevelCode"
+		 FROM member_basic_info 	
+			
+		 <where>
+			 del_flag = '0'
+		
+			 and code= #{memberCode}
+		</where>
+	</select>
+	
+	<select id="get" resultType="MemberBasicInfoResult">
+		SELECT 
+			<include refid="memberBasicInfoColumns"/>
+		FROM member_basic_info a
+		<include refid="memberBasicInfoJoins"/>
+		WHERE a.id = #{memberBasicInfo.id}
+	</select>
+	
+	<resultMap type="MemberBasicInfoResult" id="memberBasicInfoResult">
+		<result column="SUM(ogl1.goods_discount_price * ogl1.goods_uint_num)" property="monetary"/>
+	</resultMap>
+	
+	<select id="queryMemberBasicInfoResult" parameterType="MemberBasicInfoResult" resultType="MemberBasicInfoResult">
+		SELECT 
+	        SUM(ogl1.goods_discount_price * ogl1.goods_uint_num) AS "monetary" 
+		FROM order_info o1
+	    <include refid="memberBasicMonetaryInfoJoins"/>
+		WHERE
+		    ogl1.del_flag = #{DEL_FLAG_NORMAL} AND  o1.pay_per_code  = #{memberCode}
+	</select>
+	
+	<select id="getMemberCount" resultType="int">
+		SELECT 
+			count(*)
+		FROM member_basic_info a
+
+		WHERE a.del_flag = '0'
+	</select>
+	
+	<select id="queryByMemberLevelCode" parameterType="MemberBasicInfo" resultType="MemberBasicInfo">
+ 	     SELECT 
+             a.member_level_code AS "member_level_code"
+             FROM member_basic_info a
+         <where>
+             a.del_flag = #{DEL_FLAG_NORMAL}
+             <if test="memberLevelCode != null and memberLevelCode != ''">
+                 AND a.member_level_code = #{memberLevelCode}
+             </if>
+         </where>
+     </select>
+     
+     <select id="getmyConsultation" parameterType="MemberBasicInfo" resultType="com.tuling.modules.member.memberquery.entity.MyConsultation">
+		 SELECT 
+		   id AS "id",
+		   title AS "title",
+		   synopsis AS "synopsis",
+		   pic_id AS "picId",
+		   consultation_id AS "consultationId",
+		   consultation_name AS "consultationName"
+			FROM my_consultation
+			WHERE member_code = #{code}
+	</select>
+	
+     <!-- 用于会员信息导出 -->
+	<select id="queryExportList" parameterType="MemberBasicInfoFilter" resultType="MemberBasicInfoResultResult">
+		SELECT 
+		   
+		member_code AS "memberCode",	
+		rela_per_name AS "relaPerName",
+		rela_per_gender_name AS "relaPerGenderName",
+		rela_per_birthday AS "relaPerBirthday",		
+		rela_per_certificate_type AS "relaPerCertificateType",
+		rela_per_certificate_name AS "relaPerCertificateName",
+		rela_per_certificate_no AS "relaPerCertificateNo",
+		rela_per_mobile_phone AS "mobilePhone",
+		create_time AS "createTime"
+	    FROM member_relationship_info 
+		
+		<where>
+			del_flag = #{DEL_FLAG_NORMAL}
+			and member_code=rela_per_code
+		    <if test="name != null and name != ''">
+			    AND rela_per_name LIKE 
+			    <if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+			    <if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+			    <if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+		    </if>
+	       	<if test="relaPerMobilePhone != null and relaPerMobilePhone != ''">
+				AND rela_per_mobile_phone LIKE 
+				<if test="dbName == 'oracle'">'%'||#{relaPerMobilePhone}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{relaPerMobilePhone}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{relaPerMobilePhone},'%')</if>
+			</if>
+			<if test="startCreateTime != null and startCreateTime != ''">
+            <![CDATA[
+                  AND create_time >=  DATE_FORMAT(#{startCreateTime}, '%Y-%m-%d')
+            ]]>
+	        </if>
+	         <if test="endCreateTime != null and endCreateTime != ''">
+            <![CDATA[
+                  AND create_time <=  DATE_FORMAT(#{endCreateTime}, '%Y-%m-%d 23:59:59')
+            ]]>
+	        </if>
+		    <if test="memberCode != null and memberCode != ''">
+				AND member_code = #{memberCode}
+			</if>
+			
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY update_time DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	
+</mapper>

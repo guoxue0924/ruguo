@@ -1,0 +1,471 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.foundation.modules.sys.dao.OrganizationDao">
+
+	<sql id="organizationColumns">
+		a.id AS "id",
+		a.code AS "code",
+		a.name AS "name",
+		a.org_type AS "orgType",
+		a.org_platform_type AS "orgPlatformType",
+		a.org_post_code AS "orgPostCode",
+		a.org_fax AS "orgFax",
+		a.org_url AS "orgUrl",
+		a.address AS "address",
+		a.contact_person AS "contactPerson",
+		a.contact_phone AS "contactPhone",
+		a.province AS "province",
+		a.province_code AS "provinceCode",
+		a.city AS "city",
+		a.city_code AS
+		"cityCode",
+		a.county AS "county",
+		a.county_code AS "countyCode",
+		a.town_code AS "townCode",
+		a.town AS "town",
+		<!-- a.is_enable AS "isEnable",
+		a.enable_date AS "enableDate", -->
+		a.create_by AS "createBy.id",
+		a.create_time AS "createTime",
+		a.update_by AS "updateBy.id",
+		a.update_time AS "updateTime",
+		a.del_flag AS "delFlag",
+		a.remark AS
+		"remark"
+	</sql>
+
+	<sql id="organizationJoins">
+	</sql>
+
+	<select id="getOfficeList" resultType="Organization">
+		SELECT
+		<include refid="organizationColumns" />
+		FROM sys_organization a
+		<include refid="organizationJoins" />
+		<where>
+			a.del_flag = '0'
+			<if test="name != null and name != ''">
+				AND name LIKE CONCAT('%','${name}','%')
+			</if>
+			<if test="code != null and code != ''">
+				AND code LIKE CONCAT('%','${code}','%')
+			</if>
+			<if test="orgType != null and orgType != ''">
+				AND org_type = #{orgType}
+			</if>
+			<!-- <if test="isEnable != null and isEnable != ''">
+				AND is_enable = #{isEnable}
+			</if> -->
+
+			<if test="orgPlatformType != null and orgPlatformType != ''">
+				AND org_platform_type = #{orgPlatformType}
+			</if>
+
+			<if test="provinceCode != null and provinceCode != ''">
+				AND province_code = #{provinceCode}
+			</if>
+			<if test="cityCode != null and cityCode != ''">
+				AND city_code = #{cityCode}
+			</if>
+			<if test="countyCode != null and countyCode != ''">
+				AND county_code = #{countyCode}
+			</if>
+			<if test="townCode != null and townCode != ''">
+				AND town_code = #{townCode}
+			</if>
+			<!-- <if test="startEnableDate != null and startEnableDate != ''">
+	            <![CDATA[
+	                  AND DATE_FORMAT(enable_date, '%Y-%m-%d') >=  DATE_FORMAT(#{startEnableDate}, '%Y-%m-%d')
+	            ]]>
+			</if>
+			<if test="endEnableDate != null and endEnableDate != ''">
+	            <![CDATA[
+	                  AND DATE_FORMAT(enable_date, '%Y-%m-%d') <=  DATE_FORMAT(#{endEnableDate}, '%Y-%m-%d')
+	            ]]>
+			</if> -->
+			
+
+		</where>
+		ORDER BY a.update_time DESC
+	</select>
+	
+	<select id="getOfficeListInside" resultType="Organization">
+		SELECT
+		<include refid="organizationColumns" />
+		FROM sys_organization a
+		<include refid="organizationJoins" />
+		<where>
+			a.del_flag = '0'
+			<if test="name != null and name != ''">
+				AND name LIKE CONCAT('%','${name}','%')
+			</if>
+			<if test="contactPerson != null and contactPerson != ''">
+				AND contact_person LIKE CONCAT('%','${contactPerson}','%')
+			</if>
+			<if test="provinceCode != null and provinceCode != ''">
+				AND province_code = #{provinceCode}
+			</if>
+			<if test="cityCode != null and cityCode != ''">
+				AND city_code = #{cityCode}
+			</if>
+			<if test="countyCode != null and countyCode != ''">
+				AND county_code = #{countyCode}
+			</if>
+			<if test="townCode != null and townCode != ''">
+				AND town_code = #{townCode}
+			</if>
+			AND org_platform_type = '1'
+
+		</where>
+		ORDER BY a.update_time DESC
+	</select>
+
+	<select id="findByAddress" resultType="Organization">
+		SELECT
+		<include refid="organizationColumns" />
+		FROM sys_organization a
+		<include refid="organizationJoins" />
+		<where>
+			a.del_flag = '0'
+			<if test="provinceCode != null and provinceCode != ''">
+				AND province_code = #{provinceCode}
+			</if>
+			<if test="cityCode != null and cityCode != ''">
+				AND city_code = #{cityCode}
+			</if>
+			<if test="countyCode != null and countyCode != ''">
+				AND county_code = #{countyCode}
+			</if>
+			<if test="townCode != null and townCode != ''">
+				AND town_code = #{townCode}
+			</if>
+		</where>
+	</select>
+
+	<select id="findById" resultType="Organization">
+		SELECT
+		<include refid="organizationColumns" />
+		FROM sys_organization a
+		<include refid="organizationJoins" />
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="Organization">
+		SELECT
+		<include refid="organizationColumns" />
+		FROM sys_organization a
+		<include refid="organizationJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="name != null and name != ''">
+				AND a.name LIKE
+				<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_time DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="Organization">
+		SELECT
+		<include refid="organizationColumns" />
+		FROM sys_organization a
+		<include refid="organizationJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_time DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insertOrganization">
+		INSERT INTO sys_organization(
+		id,
+		code,
+		name,
+		org_type,
+		org_platform_type,
+		org_post_code,
+		org_fax,
+		org_url,
+		address,
+		contact_person,
+		contact_phone,
+		province,
+		province_code,
+		city,
+		city_code,
+		county,
+		county_code,
+		town_code,
+		town,
+		<!-- is_enable,
+		enable_date, -->
+		create_by,
+		create_time,
+		update_by,
+		update_time,
+		del_flag,
+		remark
+		) VALUES (
+		#{id},
+		#{code},
+		#{name},
+		#{orgType},
+		#{orgPlatformType},
+		#{orgPostCode},
+		#{orgFax},
+		#{orgUrl},
+		#{address},
+		#{contactPerson},
+		#{contactPhone},
+		#{province},
+		#{provinceCode},
+		#{city},
+		#{cityCode},
+		#{county},
+		#{countyCode},
+		#{townCode},
+		#{town},
+		<!-- #{isEnable},
+		#{enableDate}, -->
+		#{createBy.id},
+		#{createTime},
+		#{updateBy.id},
+		#{updateTime},
+		#{delFlag},
+		#{remark}
+		)
+	</insert>
+
+	<update id="updateOrganization">
+		UPDATE sys_organization SET
+		code = #{code},
+		name = #{name},
+		org_type = #{orgType},
+		org_platform_type = #{orgPlatformType},
+		org_post_code = #{orgPostCode},
+		org_fax = #{orgFax},
+		org_url = #{orgUrl},
+		address = #{address},
+		contact_person = #{contactPerson},
+		contact_phone = #{contactPhone},
+		province = #{province},
+		province_code = #{provinceCode},
+		city = #{city},
+		city_code = #{cityCode},
+		county = #{county},
+		county_code = #{countyCode},
+		town_code = #{townCode},
+		town = #{town},
+		update_by = #{updateBy.id},
+		update_time = #{updateTime},
+		remark = #{remark}
+		WHERE id = #{id}
+	</update>
+
+	<update id="delete">
+		UPDATE sys_organization SET
+		del_flag = #{DEL_FLAG_DELETE},
+		update_by = #{updateBy.id},
+		update_time = #{updateTime}
+		WHERE id = #{id}
+	</update>
+
+	<update id="deleteOffice">
+		UPDATE sys_organization SET
+		del_flag = '1'
+		WHERE id in
+		<foreach item="UmOrganizationids" collection="array" open="("
+			separator="," close=")">
+			#{UmOrganizationids}
+		</foreach>
+	</update>
+
+	<!-- <update id="whetherIsEnable">
+		UPDATE sys_organization SET
+		is_enable = #{isEnable},
+		enable_date = #{enableDate}
+		WHERE id = #{id}
+	</update> -->
+
+	<select id="findByOwnZoneCode" resultType="Organization">
+		SELECT
+		<include refid="organizationColumns" />
+		FROM sys_organization a
+		<include refid="organizationJoins" />
+		WHERE a.code = #{ownZoneCode}
+	</select>
+
+	<select id="findByParentId" resultType="Organization">
+		SELECT
+		<include refid="organizationColumns" />
+		FROM sys_organization a
+		<include refid="organizationJoins" />
+		<!-- <where>
+			a.is_enable = '1'
+		</where> -->
+	</select>
+
+	<select id="findByParentIdBean" resultType="Organization">
+		SELECT
+		<include refid="organizationColumns" />
+		FROM sys_organization a
+		<include refid="organizationJoins" />
+		<where>
+			a.org_type = #{orgType}
+		</where>
+	</select>
+
+	<select id="findByCode" resultType="Organization">
+		SELECT
+		<include refid="organizationColumns" />
+		FROM sys_organization a
+		<include refid="organizationJoins" />
+		WHERE a.code = #{code}
+	</select>
+
+	<select id="findByCodeList" resultType="Organization">
+		SELECT
+		<include refid="organizationColumns" />
+		FROM sys_organization a
+		<include refid="organizationJoins" />
+	</select>
+
+	<select id="get" resultType="Organization">
+		SELECT
+		<include refid="organizationColumns" />
+		FROM sys_organization a
+		<include refid="organizationJoins" />
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findByCodeName" resultType="Organization">
+		SELECT
+		<include refid="organizationColumns" />
+		FROM sys_organization a
+		<include refid="organizationJoins" />
+		WHERE a.del_flag = #{DEL_FLAG_NORMAL} 
+		<if test="name != null and name != ''">
+			AND a.name = #{name}
+		</if>
+		<if test="code != null and code != ''">
+			AND a.code = #{code}
+		</if>
+	</select>
+
+	<!-- 更新机构信息省的名字 -->
+	<update id="updateProvince">
+		UPDATE sys_organization t
+		<set>
+			<if test="province != null">
+				t.province = #{province},
+			</if>
+		</set>
+		<where>
+			t.province_code = #{provinceCode}
+			and t.org_type = '1'
+		</where>
+	</update>
+	<!-- 更新机构信息市的名字 -->
+	<update id="updateCity">
+		UPDATE sys_organization t
+		<set>
+			<if test="city != null">
+				t.city = #{city},
+			</if>
+		</set>
+		<where>
+			t.city_code = #{cityCode}
+			and t.org_type = '1'
+		</where>
+	</update>
+	<!-- 更新机构信息区县的名字 -->
+	<update id="updateCounty">
+		UPDATE sys_organization t
+		<set>
+			<if test="county != null">
+				t.county = #{county},
+			</if>
+		</set>
+		<where>
+			t.county_code = #{countyCode}
+			and t.org_type = '1'
+		</where>
+	</update>
+	<!-- 更新管理机构的机构名称 -->
+	<update id="updateName">
+		UPDATE sys_organization t
+		<set>
+			t.name = CONCAT(t.province , t.city ,t.county)
+		</set>
+		<where>
+			(t.province_code = #{code}
+			or city_code = #{code}
+			or county_code = #{code})
+			and t.org_type = '1'
+		</where>
+	</update>
+
+
+	<select id="findByList" resultType="Organization">
+		SELECT
+		<include refid="organizationColumns" />
+		FROM sys_organization a
+		<include refid="organizationJoins" />
+		<where>
+			a.del_flag = '0'
+		</where>
+	</select>
+	
+	<select id="getOfficeListByName" resultType="Organization">
+		SELECT
+		<include refid="organizationColumns" />
+		FROM sys_organization a
+		<include refid="organizationJoins" />
+		<where>
+			a.del_flag = '0'
+			<if test="name != null and name != ''">
+				AND name LIKE CONCAT('%','${name}','%')
+			</if>
+			<if test="code != null and code != ''">
+				AND code LIKE CONCAT('%','${code}','%')
+			</if>
+			<if test="orgType != null and orgType != ''">
+				AND org_type = #{orgType}
+			</if>
+
+			<if test="orgPlatformType != null and orgPlatformType != ''">
+				AND org_platform_type = #{orgPlatformType}
+			</if>
+
+			<if test="provinceCode != null and provinceCode != ''">
+				AND province_code = #{provinceCode}
+			</if>
+			<if test="cityCode != null and cityCode != ''">
+				AND city_code = #{cityCode}
+			</if>
+			<if test="countyCode != null and countyCode != ''">
+				AND county_code = #{countyCode}
+			</if>
+			<if test="townCode != null and townCode != ''">
+				AND town_code = #{townCode}
+			</if>
+		</where>
+		ORDER BY a.name ASC
+	</select>
+</mapper>

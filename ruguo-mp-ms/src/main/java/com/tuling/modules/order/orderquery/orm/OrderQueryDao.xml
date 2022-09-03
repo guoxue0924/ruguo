@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tuling.modules.order.orderquery.dao.OrderQueryDao">
+    <!-- 查询订单表的字段 -->
+	<sql id="orderColumns">
+		 a.order_code AS "orderCode",					
+		 a.order_status AS "orderStatus",									
+		 a.order_pay_way AS "orderPayWay",							
+		 a.pay_per_code AS "payPerCode",									
+		 a.pay_per_name AS "payPerName",									
+		 a.pay_per_moblie AS "payPerMoblie",								
+		 a.rela_per_code AS "relaPerCode",									
+		 a.rela_per_name AS "relaPerName",									
+		 a.rela_code AS "relaCode",										
+		 a.rela_name AS "relaName",									
+		 a.rela_certificate_type_code AS "relaCertificateTypeCode",						
+		 a.rela_certificate_type_name AS "relaCertificateTypeName",						
+		 a.rela_certificate_no AS "relaCertificateNo",								
+		 a.is_msg_notice AS "isMsgNotice",									
+		 a.addr_code AS "addrCode",				  					
+		 a.express_code AS "expressCode",									
+		 a.express_name AS "expressName",				 					
+		 a.express_price AS "expressPrice",				 					
+		 a.create_time  AS "createTime",			 					
+		 a.create_by AS "createBy",										
+		 a.update_time  AS "updateTime",		 					
+		 a.update_by AS "updateBy",				 						
+		 a.del_flag AS "delFlag",				 						
+		 a.remark AS "remark"					
+	</sql>
+	<!-- 查询订单表和订单商品表的字段 -->
+	<sql id="orderAndGoodsColumns">
+		 a.id AS "id",
+		 a.order_code AS "orderCode",	
+		 a.pay_per_name AS "payPerName",				
+		 a.order_status AS "orderStatus",									
+		 a.order_pay_way AS "orderPayWay",							
+		 a.create_time AS "createTime",		 					
+		 sum(ifnull(b.goods_price,0) * ifnull(b.goods_uint_num,0)) AS "goodsPrice",		
+		 sum(ifnull(b.goods_discount_price,0) * ifnull(b.goods_uint_num,0)) AS "goodsDiscountPrice"					
+	</sql>
+	<!-- 查询订单表和支付表的字段 -->
+    <sql id="orderAndPayColumns">
+    	 a.id AS "id",
+		 a.order_code AS "orderCode",					
+		 a.order_status AS "orderStatus",									
+		 a.order_pay_way AS "orderPayWay",							
+		 a.pay_per_name AS "payPerName",									
+		 a.pay_per_moblie AS "payPerMoblie",								
+		 a.rela_per_name AS "relaPerName",									
+		 a.rela_name AS "relaName",									
+		 a.rela_certificate_type_name AS "relaCertificateTypeName",						
+		 a.rela_certificate_no AS "relaCertificateNo",		
+		 a.addr_code AS "addrCode",						
+		 a.create_time AS "createTime",	
+		 a.transaction_time AS "transactionTime",
+		 a.out_trade_no AS "outTradeNo",
+		 a.remark AS "remark"
+		 	 					
+	</sql>
+	<!-- 查询订单表支付表和退款审核表的字段 -->
+	<sql id="orderAndPayAndRefundColumns">
+    	 a.id AS "id",
+		 a.order_code AS "orderCode",					
+		 a.order_status AS "orderStatus",									
+		 a.order_pay_way AS "orderPayWay",							
+		 a.pay_per_name AS "payPerName",									
+		 a.pay_per_moblie AS "payPerMoblie",								
+		 a.rela_per_name AS "relaPerName",									
+		 a.rela_name AS "relaName",									
+		 a.rela_certificate_type_name AS "relaCertificateTypeName",						
+		 a.rela_certificate_no AS "relaCertificateNo",	
+		 a.addr_code AS "addrCode",								
+		 a.create_time AS "createTime",	
+		 a.remark AS "remark",
+		 c.id AS "orderRefund.id",
+		 c.refund_reason AS "orderRefund.refundReason"		 					
+	</sql>
+	<!-- 查询订单表的数据 -->
+	<select id="getOrderList" parameterType="OrderFilter" resultType="Order">
+		SELECT 
+		   b.goods_name AS "goodsName",
+			<include refid="orderAndGoodsColumns"/>
+		FROM order_info a left join order_goods_list b on a.order_code = b.order_code  AND a.del_flag = #{DEL_FLAG_NORMAL} AND b.del_flag = #{DEL_FLAG_NORMAL}
+		     left join member_basic_info c on a.pay_per_code = c.code
+		<where>
+		<!--  
+			<if test="orgCode != null and orgCode != ''">
+					AND c.org_code = #{orgCode}
+			</if>
+			-->
+			<if test="orderStatus != null and orderStatus != ''">
+					AND a.order_status = #{orderStatus}
+			</if>
+			<if test="orderCode != null and orderCode != ''">
+					AND a.order_code = #{orderCode}
+			</if>
+			<if test="payPerCode != null and payPerCode != ''">
+					AND a.pay_per_code = #{payPerCode}
+			</if>
+			<if test="payPerName != null and payPerName != ''">
+				AND a.pay_per_name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{payPerName}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{payPerName}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{payPerName},'%')</if>
+			</if>
+			<if test="goodsName != null and goodsName != ''">
+					AND b.goods_name LIKE
+					<if test="dbName == 'oracle'">'%'||#{goodsName}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{goodsName}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{goodsName},'%')</if>
+			</if>
+			<if test="orderPayWay != null and orderPayWay != ''">
+					AND a.order_pay_way = #{orderPayWay}
+			</if>
+			<if test="startTime != null and startTime != ''">
+            <![CDATA[
+                  AND DATE_FORMAT(a.create_time, '%Y-%m-%d') >=  DATE_FORMAT(#{startTime}, '%Y-%m-%d')
+            ]]>
+	        </if>
+	        <if test="endTime != null and endTime != ''">
+            <![CDATA[
+                  AND DATE_FORMAT(a.create_time, '%Y-%m-%d') <=  DATE_FORMAT(#{endTime}, '%Y-%m-%d')
+            ]]>
+	        </if>
+		</where>
+		group by a.order_code,a.order_status,a.order_pay_way,a.create_time	
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_time DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	
+	<select id="getOrderAndRefundList" parameterType="OrderFilter" resultType="com.tuling.modules.order.orderquery.entity.OrderAndRefundFilter">
+		SELECT 
+		     d.approval_status,
+		     b.goods_name AS "goodsName",
+			<include refid="orderAndGoodsColumns"/>
+			
+		FROM order_info a 
+		left join order_goods_list b on a.order_code = b.order_code  AND a.del_flag = #{DEL_FLAG_NORMAL} AND b.del_flag = #{DEL_FLAG_NORMAL}
+		left join member_basic_info c on a.pay_per_code = c.code
+		LEFT JOIN order_refund_info d ON d.order_code = a.order_code
+		<where>
+		<!--  
+			<if test="orgCode != null and orgCode != ''">
+					AND c.org_code = #{orgCode}
+			</if>
+			-->
+			<if test="orderStatus != null and orderStatus != ''">
+					AND a.order_status = #{orderStatus}
+			</if>
+			<if test="orderCode != null and orderCode != ''">
+					AND a.order_code = #{orderCode}
+			</if>
+			<if test="payPerCode != null and payPerCode != ''">
+					AND a.pay_per_code = #{payPerCode}
+			</if>
+			<if test="payPerName != null and payPerName != ''">
+				AND a.pay_per_name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{payPerName}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{payPerName}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{payPerName},'%')</if>
+			</if>
+			<if test="goodsName != null and goodsName != ''">
+					AND b.goods_name LIKE
+					<if test="dbName == 'oracle'">'%'||#{goodsName}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{goodsName}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{goodsName},'%')</if>
+			</if>
+			<if test="orderPayWay != null and orderPayWay != ''">
+					AND a.order_pay_way = #{orderPayWay}
+			</if>
+			<if test="startTime != null and startTime != ''">
+            <![CDATA[
+                  AND DATE_FORMAT(a.create_time, '%Y-%m-%d') >=  DATE_FORMAT(#{startTime}, '%Y-%m-%d')
+            ]]>
+	        </if>
+	        <if test="endTime != null and endTime != ''">
+            <![CDATA[
+                  AND DATE_FORMAT(a.create_time, '%Y-%m-%d') <=  DATE_FORMAT(#{endTime}, '%Y-%m-%d')
+            ]]>
+	        </if>
+		</where>
+		group by a.order_code,a.order_status,a.order_pay_way,a.create_time	
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_time DESC
+			</otherwise>
+		</choose>
+	</select>
+	<!-- 通过订单编号查询订单表和支付表的数据 -->
+	<select id="getOrderByOrderCode" parameterType="Order" resultType="Order">
+		SELECT 
+		<include refid="orderAndPayColumns"/>
+		FROM order_info a 
+		<where> 
+			a.order_code = #{orderCode}
+		</where>
+		ORDER BY a.update_time DESC
+	</select>
+	<!-- 通过订单编号查询订单表、支付表和退款审核表的数据 -->
+	<select id="getOrderInfoByOrderCode" parameterType="Order" resultType="Order">
+		SELECT 
+		<include refid="orderAndPayAndRefundColumns"/>
+		FROM order_info a 
+			left join order_refund_info c on a.order_code = c.order_code
+		<where> 
+			a.order_code = #{orderCode}
+		</where>
+	</select>
+	<!-- 通过订单编号更新审核表的审核状态字段 -->
+	<update id="updateOrderStatus" parameterType="Order">
+		UPDATE 
+			order_info a 
+		SET
+			a.order_status = #{orderStatus},
+			a.update_by =  #{updateBy.id},
+			a.update_time = #{updateTime}
+		<where> 
+			a.order_code = #{orderCode}
+		</where>
+	</update>
+	
+	<select id="getOrderContent" parameterType="Order" resultType="com.tuling.modules.home.entity.HomeOrderFilter">
+		SELECT count(DISTINCT(oi.order_code)) as "orderCount",SUM(ogl.goods_price * ogl.goods_uint_num)  as "priceCount"
+		FROM order_info oi
+		LEFT JOIN order_goods_list ogl ON oi.order_code = ogl. order_code
+			<if test="orderStatus != null and orderStatus != ''">
+				WHERE oi.order_status = #{orderStatus}
+			</if>
+	</select>
+	
+	<select id="getmyOrder" parameterType="com.tuling.modules.member.memberquery.entity.MemberBasicInfo" resultType="com.tuling.modules.order.orderquery.entity.MyOrderFilter">
+		SELECT 
+			b.goods_name,
+			c.goods_type,
+			c.goods_title,
+
+		
+
+			c.goods_validity_num,
+			c.goods_validity_unit
+		FROM order_info a, order_goods_list b,goods_basic_info c
+		WHERE  a.order_code = b.order_code
+		AND c.goods_code = b.goods_code
+
+		AND a.create_by = #{code}
+		AND a.del_flag = '0'
+	</select>
+	
+</mapper>

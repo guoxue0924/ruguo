@@ -1,0 +1,524 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.foundation.modules.sys.dao.DictZoneDao">
+
+    <sql id="dictZoneColumns">
+        t.id,
+        t.parent_id,
+        t.parent_ids,
+        t.name,
+        if(t.level=1,t.name,CONCAT(IFNULL(t.province,''),IFNULL(t.city,''),IFNULL(t.county,''),IFNULL(t.town,''))) as full_name,
+        CONCAT(if(t.level>2,IFNULL(t.province,''),''),if(t.level>3,IFNULL(t.city,''),''),if(t.level>4,IFNULL(t.county,''),'')) as parent_full_name,
+        t.code,
+        t.spell,
+        t.province,
+        t.province_code,
+        t.city,
+        t.city_code,
+        t.county,
+        t.county_code,
+        t.town,
+        t.town_code,
+        t.level,
+        t.zone_tag,
+        t.is_poor_county,
+        t.is_all_cover,
+        t.is_enable,
+        t.enable_date,
+        t.create_by as "createBy.id",
+        t.create_time,
+        t.update_by as "updateBy.id",
+        t.update_time,
+        t.del_flag,
+        t.remark,
+        t.sort
+    </sql>
+
+    <!-- 查询区域信息 -->
+    <select id="get" resultType="DictZone">
+        SELECT
+        <include refid="dictZoneColumns"/>
+        FROM sys_dict_zone t
+        <where> t.del_flag = #{DEL_FLAG_NORMAL}
+                and t.id = #{id}
+        </where>
+    </select>
+
+    <!-- 根据区划编码查询区域信息 -->
+    <select id="getByCode" resultType="DictZone">
+        SELECT
+        <include refid="dictZoneColumns"/>
+        FROM sys_dict_zone t
+        <where> t.del_flag = #{DEL_FLAG_NORMAL}
+            and t.id = #{code}
+        </where>
+    </select>
+    
+    <!-- 根据区划编码查询区划信息 by liuhuan at 20170520 start -->
+    <select id="getByZoneCode" resultType="DictZone">
+        SELECT
+        <include refid="dictZoneColumns"/>
+        FROM sys_dict_zone t
+        <where> t.del_flag = '0'
+            and t.code = #{code}
+        </where>
+    </select>
+    <!-- 根据区划编码查询区划信息 by liuhuan at 20170520 end -->
+
+    <!-- 分页查询区域信息 -->
+    <select id="findList" resultType="DictZone">
+        SELECT
+            <include refid="dictZoneColumns"/>
+        FROM sys_dict_zone t
+        <where> t.del_flag = #{DEL_FLAG_NORMAL}
+            <if test="id != null and id != ''">
+                and t.id = #{id}
+            </if>
+            <if test="parentId != null and parentId != ''">
+                and t.parent_id = #{parentId}
+            </if>
+            <if test="name != null and name != ''">
+                and t.name like #{name}
+            </if>
+            <if test="code != null and code != ''">
+                and t.code = #{code}
+            </if>
+            <if test="spell != null and spell != ''">
+                and t.spell like #{spell}
+            </if>
+            <if test="province != null and province != ''">
+                and t.province = #{province}
+            </if>
+            <if test="provinceCode != null and provinceCode != ''">
+                and t.province_code = #{provinceCode}
+            </if>
+            <if test="city != null and city != ''">
+                and t.city = #{city}
+            </if>
+            <if test="cityCode != null and cityCode != ''">
+                and t.city_code = #{cityCode}
+            </if>
+            <if test="county != null and county != ''">
+                and t.county = #{county}
+            </if>
+            <if test="countyCode != null and countyCode != ''">
+                and t.county_code = #{countyCode}
+            </if>
+            <if test="town != null and town != ''">
+                and t.town = #{town}
+            </if>
+            <if test="townCode != null and townCode != ''">
+                and t.town_code = #{townCode}
+            </if>
+            <if test="level != null and level != ''">
+                and t.level = #{level}
+            </if>
+            <if test="zoneTag != null and zoneTag != ''">
+                and t.zone_tag = #{zoneTag}
+            </if>
+            <if test="isPoorCounty != null and isPoorCounty != ''">
+                and t.is_poor_county = #{isPoorCounty}
+            </if>
+            <if test="isAllCover != null and isAllCover != ''">
+                and t.is_all_cover = #{isAllCover}
+            </if>
+            <if test="isEnable != null and isEnable != ''">
+                and t.is_enable = #{isEnable}
+            </if>
+            <if test="enableDate != null">
+                <![CDATA[ and DATE_FORMAT(t.enable_date, '%Y-%m-%d') =  DATE_FORMAT(#{enableDate}, '%Y-%m-%d')]]>
+            </if>
+            <if test="startEnableDate != null">
+                <![CDATA[ and t.enable_date >= #{startEnableDate} ]]>
+            </if>
+            <if test="endEnableDate != null">
+                <![CDATA[ and t.enable_date <= #{endEnableDate} ]]>
+            </if>
+        </where>
+        ORDER BY t.sort DESC, t.code ASC
+    </select>
+
+    <!-- 分页查询区域信息 -->
+    <select id="getDistrictList" resultType="DictZone">
+        SELECT
+        <include refid="dictZoneColumns"/>
+        FROM sys_dict_zone t
+        <where> t.del_flag = #{DEL_FLAG_NORMAL}
+            <if test="id != null and id != ''">
+                and t.id = #{id}
+            </if>
+            <if test="parentId != null and parentId != ''">
+                and t.parent_id = #{parentId}
+            </if>
+            <if test="name != null and name != ''">
+                and t.name like #{name}
+            </if>
+            <if test="code != null and code != ''">
+                and t.code = #{code}
+            </if>
+            <if test="codeFuzzy != null and codeFuzzy != ''">
+                and t.code like #{codeFuzzy}
+            </if>
+            <if test="spell != null and spell != ''">
+                and t.spell like #{spell}
+            </if>
+            <if test="province != null and province != ''">
+                and t.province = #{province}
+            </if>
+            <if test="provinceCode != null and provinceCode != ''">
+                and t.province_code = #{provinceCode}
+            </if>
+            <if test="city != null and city != ''">
+                and t.city = #{city}
+            </if>
+            <if test="cityCode != null and cityCode != ''">
+                and t.city_code = #{cityCode}
+            </if>
+            <if test="county != null and county != ''">
+                and t.county = #{county}
+            </if>
+            <if test="countyCode != null and countyCode != ''">
+                and t.county_code = #{countyCode}
+            </if>
+            <if test="town != null and town != ''">
+                and t.town = #{town}
+            </if>
+            <if test="townCode != null and townCode != ''">
+                and t.town_code = #{townCode}
+            </if>
+            <if test="level != null and level != ''">
+                and t.level = #{level}
+            </if>
+            <if test="zoneTag != null and zoneTag != ''">
+                and t.zone_tag = #{zoneTag}
+            </if>
+            <if test="isPoorCounty != null and isPoorCounty != ''">
+                and t.is_poor_county = #{isPoorCounty}
+            </if>
+            <if test="isAllCover != null and isAllCover != ''">
+                and t.is_all_cover = #{isAllCover}
+            </if>
+            <if test="isEnable != null and isEnable != ''">
+                and t.is_enable = #{isEnable}
+            </if>
+            <if test="enableDate != null">
+                <![CDATA[ and DATE_FORMAT(t.enable_date, '%Y-%m-%d') =  DATE_FORMAT(#{enableDate}, '%Y-%m-%d')]]>
+            </if>
+            <if test="startEnableDate != null">
+                <![CDATA[ and t.enable_date >= #{startEnableDate} ]]>
+            </if>
+            <if test="endEnableDate != null">
+                <![CDATA[ and t.enable_date <= #{endEnableDate} ]]>
+            </if>
+            <if test="exceptCode != null and exceptCode != ''">
+                and t.code != #{exceptCode}
+            </if>
+        </where>
+        ORDER BY t.sort DESC, t.code ASC
+    </select>
+
+    <!-- 查询全部区域 -->
+    <select id="findAllList" resultType="DictZone">
+        SELECT
+            <include refid="dictZoneColumns"/>
+        FROM sys_dict_zone t
+        WHERE t.del_flag = #{DEL_FLAG_NORMAL}
+        ORDER BY t.sort DESC, t.code ASC
+    </select>
+
+    <!-- 分页查询区域信息 -->
+    <select id="getSameCodeDict" resultType="DictZone">
+        SELECT
+        <include refid="dictZoneColumns"/>
+        FROM sys_dict_zone t
+        <where> t.del_flag = #{DEL_FLAG_NORMAL}
+                and t.id != #{id}
+                and t.code = #{code}
+        </where>
+    </select>
+
+    <!-- 分页查询区域信息 -->
+    <select id="getSameNameDict" resultType="DictZone">
+        SELECT
+        <include refid="dictZoneColumns"/>
+        FROM sys_dict_zone t
+        <where> t.del_flag = #{DEL_FLAG_NORMAL}
+            and t.id != #{id}
+            and t.parent_id = #{parentId}
+            and t.name = #{name}
+        </where>
+    </select>
+
+    <!-- 根据条件查询区域信息符合条件的数量 -->
+    <select id="getDictZoneCount" resultType="Integer">
+        SELECT
+            count(t.id)
+        FROM sys_dict_zone t
+        <where> t.del_flag = #{DEL_FLAG_NORMAL}
+            <if test="id != null and id != ''">
+                and t.id = #{id}
+            </if>
+            <if test="parentId != null and parentId != ''">
+                and t.parent_id = #{parentId}
+            </if>
+            <if test="name != null and name != ''">
+                and t.name like #{name}
+            </if>
+            <if test="code != null and code != ''">
+                and t.code = #{code}
+            </if>
+            <if test="spell != null and spell != ''">
+                and t.spell like #{spell}
+            </if>
+            <if test="province != null and province != ''">
+                and t.province = #{province}
+            </if>
+            <if test="provinceCode != null and provinceCode != ''">
+                and t.province_code = #{provinceCode}
+            </if>
+            <if test="city != null and city != ''">
+                and t.city = #{city}
+            </if>
+            <if test="cityCode != null and cityCode != ''">
+                and t.city_code = #{cityCode}
+            </if>
+            <if test="county != null and county != ''">
+                and t.county = #{county}
+            </if>
+            <if test="countyCode != null and countyCode != ''">
+                and t.county_code = #{countyCode}
+            </if>
+            <if test="town != null and town != ''">
+                and t.town = #{town}
+            </if>
+            <if test="townCode != null and townCode != ''">
+                and t.town_code = #{townCode}
+            </if>
+            <if test="level != null and level != ''">
+                and t.level = #{level}
+            </if>
+            <if test="zoneTag != null and zoneTag != ''">
+                and t.zone_tag = #{zoneTag}
+            </if>
+            <if test="isPoorCounty != null and isPoorCounty != ''">
+                and t.is_poor_county = #{isPoorCounty}
+            </if>
+            <if test="isAllCover != null and isAllCover != ''">
+                and t.is_all_cover = #{isAllCover}
+            </if>
+            <if test="isEnable != null and isEnable != ''">
+                and t.is_enable = #{isEnable}
+            </if>
+            <if test="enableDate != null">
+                <![CDATA[ and DATE_FORMAT(t.enable_date, '%Y-%m-%d') =  DATE_FORMAT(#{enableDate}, '%Y-%m-%d')]]>
+            </if>
+            <if test="startEnableDate != null">
+                <![CDATA[ and t.enable_date >= #{startEnableDate} ]]>
+            </if>
+            <if test="endEnableDate != null">
+                <![CDATA[ and t.enable_date <= #{endEnableDate} ]]>
+            </if>
+        </where>
+    </select>
+
+    <!-- 插入区划信息 -->
+    <insert id="insert" >
+        INSERT INTO sys_dict_zone (
+            id,
+            parent_id,
+            parent_ids,
+            name,
+            code,
+            spell,
+            province,
+            province_code,
+            city,
+            city_code,
+            county,
+            county_code,
+            town,
+            town_code,
+            level,
+            zone_tag,
+            is_poor_county,
+            is_all_cover,
+            is_enable,
+            enable_date,
+            create_by,
+            create_time,
+            update_by,
+            update_time,
+            del_flag,
+            remark,
+            sort
+        ) VALUES (
+            #{id},
+            #{parentId},
+            #{parentIds},
+            #{name},
+            #{code},
+            #{spell},
+            #{province},
+            #{provinceCode},
+            #{city},
+            #{cityCode},
+            #{county},
+            #{countyCode},
+            #{town},
+            #{townCode},
+            #{level},
+            #{zoneTag},
+            #{isPoorCounty},
+            #{isAllCover},
+            #{isEnable},
+            #{enableDate},
+            #{createBy.id},
+            #{createTime},
+            #{updateBy.id},
+            #{updateTime},
+            #{delFlag},
+            #{remark},
+            #{sort}
+        )
+    </insert>
+
+    <!-- 更新区划信息 -->
+    <update id="update" >
+        UPDATE sys_dict_zone t
+        <set>
+            <if test="parentId != null">
+                t.parent_id = #{parentId},
+            </if>
+            <if test="parentIds != null">
+                t.parent_ids = #{parentIds},
+            </if>
+            <if test="name != null">
+                t.name = #{name},
+            </if>
+            <if test="code != null">
+                t.code = #{code},
+            </if>
+            <if test="spell != null">
+                t.spell = #{spell},
+            </if>
+            <if test="province != null">
+                t.province = #{province},
+            </if>
+            <if test="provinceCode != null">
+                t.province_code = #{provinceCode},
+            </if>
+            <if test="city != null">
+                t.city = #{city},
+            </if>
+            <if test="cityCode != null">
+                t.city_code = #{cityCode},
+            </if>
+            <if test="county != null">
+                t.county = #{county},
+            </if>
+            <if test="countyCode != null">
+                t.county_code = #{countyCode},
+            </if>
+            <if test="town != null">
+                t.town = #{town},
+            </if>
+            <if test="townCode != null">
+                t.town_code = #{townCode},
+            </if>
+            <if test="level != null">
+                t.level = #{level},
+            </if>
+            <if test="zoneTag != null">
+                t.zone_tag = #{zoneTag},
+            </if>
+            <if test="isPoorCounty != null">
+                t.is_poor_county = #{isPoorCounty},
+            </if>
+            <if test="isAllCover != null">
+                t.is_all_cover = #{isAllCover},
+            </if>
+            <if test="isEnable != null">
+                t.is_enable = #{isEnable},
+            </if>
+            <if test="enableDate != null">
+                t.enable_date = #{enableDate},
+            </if>
+            <if test="createBy != null">
+                t.create_by = #{createBy.id},
+            </if>
+            <if test="createTime != null">
+                t.create_time = #{createTime},
+            </if>
+            <if test="updateBy != null">
+                t.update_by = #{updateBy.id},
+            </if>
+            <if test="updateTime != null">
+                t.update_time = #{updateTime},
+            </if>
+            <if test="delFlag != null">
+                t.del_flag = #{delFlag},
+            </if>
+            <if test="remark != null">
+                t.remark = #{remark},
+            </if>
+            <if test="sort != null">
+                t.sort = #{sort},
+            </if>
+        </set>
+        <where>
+            t.id = #{id}
+        </where>
+    </update>
+
+    <!-- 删除区划信息 -->
+    <delete id="delete">
+        DELETE FROM sys_dict_zone t
+        <where> t.id = #{id}
+        </where>
+    </delete>
+
+    <!-- 删除区划信息 -->
+    <delete id="deleteLogical">
+        UPDATE sys_dict_zone t SET t.del_flag = #{DEL_FLAG_DELETE}
+        <where>
+            t.id = #{id}
+        </where>
+    </delete>
+
+	<!-- 更新区划信息省的名字 -->
+    <update id="updateProvince" >
+        UPDATE sys_dict_zone t
+        <set>
+            <if test="province != null">
+                t.province = #{province},
+            </if>
+        </set>
+        <where>
+            t.province_code = #{code}
+        </where>
+    </update>
+    <!-- 更新区划信息市的名字 -->
+    <update id="updateCity" >
+        UPDATE sys_dict_zone t
+        <set>
+            <if test="city != null">
+                t.city = #{city},
+            </if>
+        </set>
+        <where>
+            t.city_code = #{code}
+        </where>
+    </update>
+    <!-- 更新区划信息区县的名字 -->
+    <update id="updateCounty" >
+        UPDATE sys_dict_zone t
+        <set>
+            <if test="county != null">
+                t.county = #{county},
+            </if>
+        </set>
+        <where>
+            t.county_code = #{code}
+        </where>
+    </update>
+</mapper>

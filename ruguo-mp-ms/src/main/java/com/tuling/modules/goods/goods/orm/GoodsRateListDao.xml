@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tuling.modules.goods.goods.dao.GoodsRateListDao">
+    
+ 	<sql id="goodsRateListColumns">
+		a.id AS "id",
+		a.goods_code AS "goodsCode",
+		a.member_level_code AS "memberLevelCode",
+		a.member_rate AS "member_rate",
+		a.create_by AS "createBy.id",
+		a.create_time AS "createTime",
+		a.update_by AS "updateBy.id",
+		a.update_time AS "updateTime",
+		a.remark AS "remark",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="goodsRateListJoins">
+	</sql> 
+    
+	
+	
+	<insert id="insert">
+		INSERT INTO goods_rate_list(
+			id,
+			goods_code,
+			member_level_code,
+			member_rate,
+			create_by,
+			create_time,
+			update_by,
+			update_time,
+			remark,
+			del_flag
+		) VALUES (
+			#{id},
+			#{goodsCode},
+			#{memberLevelCode},
+			#{memberRate},
+			#{createBy.id},
+			#{createTime},
+			#{updateBy.id},
+			#{updateTime},
+			#{remark},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE goods_rate_list SET 	
+			goods_code = #{goodsCode},
+			member_level_code = #{memberLevelCode},
+			member_rate = #{memberRate},
+			update_by = #{updateBy.id},
+			update_time = #{updateTime},
+			remark = #{remark},
+			del_flag = #{delFlag}
+		WHERE id = #{id}
+	</update>
+	
+	
+	<select id="findAll" resultType="GoodsRateList" parameterType="GoodsRateList">
+		SELECT 
+			<include refid="goodsRateListColumns"/>
+		FROM goods_rate_list a
+		<include refid="goodsRateListJoins"/>
+		 <where>
+			a.goods_code = #{goodsCode}
+		</where>		
+		AND a.del_flag = #{DEL_FLAG_NORMAL}
+	</select>
+	
+</mapper>

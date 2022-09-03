@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tuling.modules.goods.goodsclass.dao.GoodsClassDao">
+    
+	<sql id="goodsClassColumns">
+		a.id AS "id",
+		a.goods_class_code AS "goodsClassCode",
+		a.goods_class_name AS "goodsClassName",
+		a.goods_class_desc AS "goodsClassDesc",
+		a.is_min_class AS "isMinClass",
+		a.class_level AS "classLevel",
+		a.parent_class_code AS "parentClassCode",
+		a.class_seq_num AS "classSeqNum",
+		a.create_by AS "createBy.id",
+		a.create_time AS "createTime",
+		a.update_by AS "updateBy.id",
+		a.update_time AS "updateTime",
+		a.remark AS "remark",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="goodsClassJoins">
+	</sql>
+    
+	<select id="findById" resultType="GoodsClassInfo">
+		SELECT 
+			<include refid="goodsClassColumns"/>
+		FROM goods_class_info a
+		<include refid="goodsClassJoins"/>
+		WHERE a.id = #{id}
+		and del_flag = '0'
+		ORDER BY a.class_seq_num 
+	</select>
+	
+	
+	
+	<select id="findAll" resultType="GoodsClassInfo">
+		SELECT 
+			<include refid="goodsClassColumns"/>
+		FROM goods_class_info a
+		<include refid="goodsClassJoins"/>
+		WHERE del_flag = '0'
+		ORDER BY a.class_seq_num 
+	</select>
+	
+	<select id="findByCode" resultType="GoodsClassInfo">
+		SELECT 
+			<include refid="goodsClassColumns"/>
+		FROM goods_class_info a
+		<include refid="goodsClassJoins"/>
+		WHERE a.goods_class_code = #{goodsClassCode}
+		and del_flag = '0'
+		ORDER BY a.class_seq_num 
+	</select>
+	
+	<select id="findByParentCode" resultType="GoodsClassInfo">
+		SELECT 
+			<include refid="goodsClassColumns"/>
+		FROM goods_class_info a
+		<include refid="goodsClassJoins"/>
+		<where>
+			del_flag = '0'
+			and a.parent_class_code = #{parentClassCode}
+		</where>
+		ORDER BY a.class_seq_num 
+	</select>
+	
+	<select id="findByCodeAndName" resultType="GoodsClassInfo">
+		SELECT 
+			<include refid="goodsClassColumns"/>
+		FROM goods_class_info a
+		<include refid="goodsClassJoins"/>
+		<where>
+			del_flag = '0'
+			and a.parent_class_code = #{parentClassCode}
+			and a.goods_class_name = #{goodsClassName}
+		</where>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO goods_class_info(
+			id,
+			goods_class_code,
+			goods_class_name,
+			goods_class_desc,
+			is_min_class,
+			class_level,
+			parent_class_code,
+			class_seq_num,
+			create_by,
+			create_time,
+			update_by,
+			update_time,
+			remark,
+			del_flag
+		) VALUES (
+			#{id},
+			#{goodsClassCode},
+			#{goodsClassName},
+			#{goodsClassDesc},
+			#{isMinClass},
+			#{classLevel},
+			#{parentClassCode},
+			#{classSeqNum},
+			#{createBy.id},
+			#{createTime},
+			#{updateBy.id},
+			#{updateTime},
+			#{remark},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE goods_class_info SET 	
+			goods_class_name = #{goodsClassName},
+			goods_class_desc = #{goodsClassDesc},
+			is_min_class = #{isMinClass},
+			class_seq_num = #{classSeqNum},
+			update_by = #{updateBy.id},
+			update_time = #{updateTime},
+			remark = #{remark},
+			del_flag = #{delFlag}
+		WHERE id = #{id}
+	</update>
+	
+	<select id="findUpByCondation" resultType="GoodsClassInfo">
+		SELECT 
+			<include refid="goodsClassColumns"/>
+		FROM goods_class_info a
+		<include refid="goodsClassJoins"/>
+		<where>
+			del_flag = '0'
+			and a.parent_class_code = #{parentClassCode}
+			<![CDATA[  
+			AND a.class_seq_num < #{classSeqNum}
+			]]>
+		</where>
+		ORDER BY a.class_seq_num DESC
+	</select>
+	
+	<select id="findDownByCondation" resultType="GoodsClassInfo">
+		SELECT 
+			<include refid="goodsClassColumns"/>
+		FROM goods_class_info a
+		<include refid="goodsClassJoins"/>
+		<where>
+			del_flag = '0'
+			and a.parent_class_code = #{parentClassCode}
+			<![CDATA[  
+			AND a.class_seq_num > #{classSeqNum}
+			]]>
+		</where>
+		ORDER BY a.class_seq_num 
+	</select>
+	<select id="findClassListByParentCode" resultType="GoodsClassInfo">
+		SELECT 
+			<include refid="goodsClassColumns"/>
+		FROM goods_class_info a
+		<include refid="goodsClassJoins"/>
+		<where>
+			a.del_flag = '0'
+			AND a.parent_class_code = #{goodsClassCode}
+			</where>
+	</select>
+	
+	
+</mapper>

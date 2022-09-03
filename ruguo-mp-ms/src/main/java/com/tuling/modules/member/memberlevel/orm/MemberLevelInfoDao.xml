@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tuling.modules.member.memberlevel.dao.MemberLevelInfoDao">
+    
+	<sql id="memberLevelInfoColumns">
+		a.id AS "id",
+		a.member_level_code AS "memberLevelCode",
+		a.member_level_name AS "memberLevelName",
+		a.member_level_desc AS "memberLevelDesc",
+		a.member_level_min AS "memberLevelMin",
+		a.member_level_max AS "memberLevelMax",
+		a.create_by AS "createBy.id",
+		a.create_time AS "createTime",
+		a.update_by AS "updateBy.id",
+		a.update_time AS "updateTime",
+		a.remark AS "remark",
+		a.del_flag AS "delFlag",
+		a.member_level_discount AS "memberLevelDiscount"
+	</sql>
+	
+	<sql id="memberLevelInfoJoins">
+	</sql>
+	
+	<select id="findLevelManageList" resultType="MemberLevelInfo">
+		SELECT 
+			<include refid="memberLevelInfoColumns"/>
+		FROM member_level_info a
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+            ORDER BY a.member_level_min DESC
+	</select>
+	
+	<select id="findList" resultType="MemberLevelInfo">
+		SELECT 
+			<include refid="memberLevelInfoColumns"/>
+		FROM member_level_info a
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		    <if test="id != null and id != ''">
+		        AND a.id = #{id}
+		    </if>
+		</where>
+		ORDER BY a.member_level_min DESC
+	</select>
+	
+	<insert id="insert" parameterType="MemberLevelInfo">
+		INSERT INTO member_level_info(
+			id,
+			member_level_code,
+			member_level_name,
+			member_level_desc,
+			member_level_discount,
+			member_level_min,
+			member_level_max,
+			create_by,
+			create_time,
+			update_by,
+			update_time,
+			remark,
+			del_flag
+		) VALUES (
+			#{id},
+			#{memberLevelCode},
+			#{memberLevelName},
+			#{memberLevelDesc},
+			#{memberLevelDiscount},
+			#{memberLevelMin},
+			#{memberLevelMax},
+			#{createBy.id},
+			#{createTime},
+			#{updateBy.id},
+			#{updateTime},
+			#{remark},
+			#{delFlag}
+		)
+	</insert>
+	
+    <update id="update">
+		UPDATE member_level_info SET 	
+			member_level_name = #{memberLevelName},
+			member_level_desc = #{memberLevelDesc},
+			member_level_discount = #{memberLevelDiscount},
+			member_level_min = #{memberLevelMin},
+			member_level_max = #{memberLevelMax},
+			update_by = #{updateBy.id},
+			update_time = #{updateTime},
+			remark = #{remark}
+		WHERE id = #{id}
+	</update>
+	
+	<select id="findPresentInfoOutsideList" parameterType="MemberLevelInfo" resultType="MemberLevelInfo">
+		SELECT 
+			<include refid="memberLevelInfoColumns"/>
+		FROM member_level_info a
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="memberLevelCode != null and memberLevelCode != ''">
+                AND a.member_level_code != #{memberLevelCode}
+            </if>
+		</where>
+	</select>
+	
+	<update id="delete">
+		UPDATE member_level_info SET 
+			del_flag = #{DEL_FLAG_DELETE},
+			update_by = #{updateBy.id},
+			update_time = #{updateTime}
+		WHERE id = #{id}
+	</update>
+	
+	<select id="get" resultType="MemberLevelInfo">
+		SELECT 
+			<include refid="memberLevelInfoColumns"/>
+		FROM member_level_info a
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findMemberLevelName" parameterType="MemberLevelInfo" resultType="java.lang.String">
+		SELECT 
+			a.member_level_name AS "memberLevelName"
+		FROM member_level_info a
+		
+         <where>
+             a.del_flag = #{DEL_FLAG_NORMAL}
+             <if test="memberLevelName != null and memberLevelName != ''">
+                 AND a.member_level_name = #{memberLevelName}
+             </if>
+             <if test="memberLevelCode != null and memberLevelCode != ''">
+                 AND a.member_level_code = #{memberLevelCode}
+             </if>
+         </where>
+	</select>
+     
+</mapper>

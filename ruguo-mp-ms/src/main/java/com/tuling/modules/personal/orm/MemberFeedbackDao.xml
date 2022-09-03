@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tuling.modules.personal.dao.MemberFeedbackDao">
+    
+	<sql id="memberFeedbackColumns">
+		a.id AS "id",
+		a.feedback_code AS "feedbackCode",
+		a.feedback_type AS "feedbackType",
+		a.member_code AS "memberCode",
+		a.document AS "document",
+		a.create_by AS "createBy.id",
+	    a.create_time AS "createTime",
+	    a.update_by AS "updateBy.id",
+	    a.update_time AS "updateTime",
+	    a.remark AS "remark",
+	    a.del_flag AS "delFlag",
+		a.operation_state AS "operationState",
+		a.reply_content AS "replyContent",
+		a.reply_personnel_code AS "replyPersonnelCode",
+		a.reply_personnel_name AS "replyPersonnelName"
+	</sql>
+	
+	<sql id="memberFeedbackJoins">
+	</sql>
+	
+	<select id="queryMemberFeedbackList" parameterType="MemberFeedbackFilter" resultType="MemberFeedbackResult">
+		SELECT 
+			b.name AS "name",
+			b.mobile_phone AS "mobilePhone",
+			b.email AS "email",
+		    <include refid="memberFeedbackColumns"/>
+	    FROM member_feedback a
+		left join member_basic_info b on a.member_code = b.code
+		<where>
+			a.del_flag = "0"
+			AND b.del_flag = "0"
+		    <if test="name != null and name != ''">
+			    AND b.name LIKE 
+			    <if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+			    <if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+			    <if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+		    </if>
+			<if test="startTime != null and startTime != ''">
+            <![CDATA[
+                  AND a.update_time >=  DATE_FORMAT(#{startTime}, '%Y-%m-%d')
+            ]]>
+	        </if>
+	         <if test="endTime != null and endTime != ''">
+            <![CDATA[
+                  AND a.update_time <=  DATE_FORMAT(#{endTime}, '%Y-%m-%d 23:59:59')
+            ]]>
+	        </if>
+		    <if test="operationState != null and operationState != ''">
+				AND a.operation_state = #{operationState}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_time DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+    <select id="queryOperationStateList" parameterType="MemberFeedbackResult" resultType="MemberFeedbackResult">
+        SELECT 
+		     a.operation_state AS "operationState"
+	    FROM member_feedback a
+        WHERE a.del_flag = #{DEL_FLAG_NORMAL}
+        GROUP BY a.operation_state
+    </select>
+    
+    <select id="queryReplyContent" parameterType="MemberFeedbackResult" resultType="MemberFeedbackResult">
+        SELECT 
+             a.id AS "id",
+		     a.reply_content AS "replyContent"
+	    FROM member_feedback a
+        WHERE id = #{id}
+        AND a.del_flag = #{DEL_FLAG_NORMAL}
+    </select>
+    
+    <update id="updateMemberFeedback">
+    	UPDATE member_feedback SET 	
+			operation_state ="1",
+			reply_content = #{replyContent},
+			reply_personnel_code = #{replyPersonnelCode},
+			reply_personnel_name = #{replyPersonnelName}
+		WHERE id = #{id}
+    </update>
+     
+</mapper>

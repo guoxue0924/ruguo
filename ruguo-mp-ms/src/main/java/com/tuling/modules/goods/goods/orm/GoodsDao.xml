@@ -1,0 +1,479 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tuling.modules.goods.goods.dao.GoodsDao">
+    
+	<sql id="goodsColumns">
+		a.id AS "id",
+		a.goods_code AS "goodsCode",
+	    a.goods_class_code AS "goodsClassCode",
+		a.goods_name AS "goodsName",
+		a.goods_phoneticize AS "goodsPhoneticize",
+        a.goods_title AS "goodsTitle",
+		a.goods_type AS "goodsType",
+
+        a.service_org_level_code AS "serviceOrgLevelCode",
+		a.service_org_level_name  AS "serviceOrgLevelName",
+		a.service_org_rank_code AS "serviceOrgRankCode",
+		a.service_org_rank_name  AS "serviceOrgRankName",
+		a.service_person_type_code  AS "servicePersonTypeCode",
+		a.service_person_type_name  AS "servicePersonTypeName",
+		a.service_person_level_code  AS "servicePersonLevelCode",
+		a.service_person_level_name  AS "servicePersonLevelName",
+		a.service_person_major_code  AS "servicePersonMajorCode",
+		a.service_person_major_name  AS "servicePersonMajorName",
+		a.probation_period  AS "probationPeriod",
+		a.service_package_code  AS "servicePackageCode",
+		a.service_package_name  AS "servicePackageName",
+		
+		a.goods_stock AS "goodsStock",
+		a.goods_status AS "goodsStatus",
+		a.tag_matched_num AS "tagMatchedNum",
+		a.goods_details AS "goodsDetails",
+		a.goods_details_mobile AS "goodsDetailsMobile",
+		a.goods_icon AS "goodsIcon",
+		a.is_details_banner AS "isDetailsBanner",
+		a.is_recommend AS "isRecommend",
+		a.recommend_pic_url AS "recommendPicUrl",
+
+		a.create_by AS "createBy.id",
+		a.create_time AS "createTime",
+		a.update_by AS "updateBy.id",
+		a.update_time AS "updateTime",
+		a.remark AS "remark",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="goodsJoins">
+	</sql>
+    
+	
+	<select id="findGoodsList" parameterType="com.tuling.modules.goods.goods.entity.GoodsFilterClassCodes" resultType="Goods">
+		SELECT 
+			<include refid="goodsColumns"/>
+		FROM goods_basic_info a
+		<where>
+			a.del_flag = '0'
+			<if test="goodsCode != null and goodsCode != ''">
+					AND a.goods_code = #{goodsCode}
+			</if>
+			<if test="goodsName != null and goodsName != ''">
+				AND a.goods_name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{goodsName}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{goodsName}+'%'</if>
+				    <if test="dbName == 'mysql'">concat('%',#{goodsName},'%')</if>
+			</if>
+			
+			<if test="goodsClassCode != null and goodsClassCode.size() > 0">
+				 AND a.goods_class_code IN 
+				  <foreach item="item" index="index" collection="goodsClassCode" 
+                         open="(" separator="," close=")">
+                        #{item}
+                </foreach> 
+			</if>  
+			<if test="goodsStatus != null and goodsStatus != ''">
+				AND a.goods_status = #{goodsStatus}
+			</if>
+			
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_time DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="Goods">
+		SELECT 
+			<include refid="goodsColumns"/>
+		FROM goods_basic_info a
+		<include refid="goodsJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_time DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findGoods" resultType="Goods">
+		SELECT 
+			<include refid="goodsColumns"/>
+		FROM goods_basic_info a
+		<include refid="goodsJoins"/>
+		 <where>
+			a.del_flag = '0'
+		</where>		
+		AND a.goods_type = '1'
+		AND a.goods_status = '1'
+	</select>
+	
+	<select id="getPackageGoods" resultType="com.tuling.modules.goods.goods.entity.GoodsPackageGoodsFilter">
+		SELECT 
+			a.goods_code,
+     		a.goods_name
+		FROM goods_basic_info a 
+		 <where>
+			a.id = #{id}
+		</where>		
+	</select>
+	
+	<select id="get" resultType="Goods">
+		SELECT 
+			<include refid="goodsColumns"/>
+		FROM goods_basic_info a
+		<include refid="goodsJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findByGoodsCode" resultType="Goods">
+		SELECT 
+			<include refid="goodsColumns"/>
+		FROM goods_basic_info a
+		<include refid="goodsJoins"/>
+		WHERE a.goods_code = #{goodsCode}
+	</select>
+	
+	<select id="findByGoodsName" resultType="Goods">
+		SELECT 
+			<include refid="goodsColumns"/>
+		FROM goods_basic_info a
+		<include refid="goodsJoins"/>
+		WHERE a.goods_name = #{goodsName}
+		AND a.del_flag = '0'
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO goods_basic_info(
+			id,
+			goods_code,
+			goods_class_code,
+			goods_name,
+			goods_phoneticize,
+			goods_title,
+			goods_type,
+			service_org_level_code,
+			service_org_level_name,
+			service_org_rank_code,
+		    service_org_rank_name,
+			service_person_type_code,
+			service_person_type_name,
+			service_person_level_code,
+			service_person_level_name,
+			service_person_major_code,
+			service_person_major_name,
+			probation_period,
+			service_package_code,
+			service_package_name,
+			goods_stock,
+			goods_status,
+			tag_matched_num ,
+			goods_details,
+			goods_details_mobile,
+			goods_icon,
+			is_details_banner,
+			is_recommend,
+			recommend_pic_url,
+			create_by,
+			create_time,
+			update_by,
+			update_time,
+			remark,
+			del_flag
+		) VALUES (
+			#{id},
+			#{goodsCode},
+			#{goodsClassCode},
+			#{goodsName},
+			#{goodsPhoneticize},
+			#{goodsTitle},
+			#{goodsType},
+			#{serviceOrgLevelCode},
+			#{serviceOrgLevelName},
+			#{serviceOrgRankCode},
+			#{serviceOrgRankName},
+			#{servicePersonTypeCode},
+			#{servicePersonTypeName},
+			#{servicePersonLevelCode},
+			#{servicePersonLevelName},
+			#{servicePersonMajorCode},
+			#{servicePersonMajorName},
+			#{probationPeriod},
+			#{servicePackageCode},
+			#{servicePackageName},
+			#{goodsStock},
+			#{goodsStatus},
+			#{tagMatchedNum},
+			#{goodsDetails},
+			#{goodsDetailsMobile},
+			#{goodsIcon},
+			#{isDetailsBanner},
+			#{isRecommend},
+			#{recommendPicUrl},
+			#{createBy.id},
+			#{createTime},
+			#{updateBy.id},
+			#{updateTime},
+			#{remark},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE goods_basic_info SET 	
+			goods_code = #{goodsCode},
+			goods_class_code = #{goodsClassCode},
+			goods_name = #{goodsName},
+			goods_phoneticize = #{goodsPhoneticize},
+			goods_title = #{goodsTitle},
+			goods_type = #{goodsType},
+			
+			service_org_level_code = #{serviceOrgLevelCode},
+			service_org_level_name = #{serviceOrgLevelName},
+			service_org_rank_code = #{serviceOrgRankCode},
+			service_org_rank_name = #{serviceOrgRankName},
+			service_person_type_code = #{servicePersonTypeCode},
+			service_person_type_name = #{servicePersonTypeName},
+			service_person_level_code = #{servicePersonLevelCode},
+			service_person_level_name = #{servicePersonLevelName},
+			service_person_major_code = #{servicePersonMajorCode},
+			service_person_major_name = #{servicePersonMajorName},
+			
+			probation_period = #{probationPeriod},
+			service_package_code = #{servicePackageCode},
+			service_package_name = #{servicePackageName},
+			goods_stock = #{goodsStock},
+			goods_status = #{goodsStatus},
+			tag_matched_num = #{tagMatchedNum},
+			goods_details = #{goodsDetails},
+			goods_details_mobile = #{goodsDetailsMobile},
+			
+			goods_icon = #{goodsIcon},
+			is_details_banner = #{isDetailsBanner},
+			is_recommend = #{isRecommend},
+			recommend_pic_url = #{recommendPicUrl},
+			
+			update_by = #{updateBy.id},
+			update_time = #{updateTime},
+			remark = #{remark},
+			del_flag = #{delFlag}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="modifyGoodsStatusOn" >
+        UPDATE goods_basic_info t
+        <set>
+                goods_status = '1',
+                update_by = #{updateBy.id},
+				update_time = now()
+        </set>
+        <where>
+             t.id = #{id}
+        </where>
+    </update>
+    
+    <update id="modifyGoodsStatusOff" >
+        UPDATE goods_basic_info t
+        <set>
+                goods_status = '0',
+                update_by = #{updateBy.id},
+				update_time = now()
+        </set>
+        <where>
+             t.id = #{id}
+        </where>
+    </update>
+    
+     <update id="deleteGoods" >
+        UPDATE goods_basic_info t
+        <set>
+                del_flag = #{DEL_FLAG_DELETE},
+                update_by = #{updateBy.id},
+				update_time = now()
+        </set>
+        <where>
+             t.id = #{id}
+        </where>
+    </update>
+    
+  <!--  <select id="findGoodsPackageListGoodsByGoodsCode" resultType="Goods">
+		SELECT 
+			<include refid="goodsColumns"/>
+		FROM goods_basic_info b,goods_basic_info a,goods_package_list c
+		<include refid="goodsJoins"/>
+		WHERE b.goods_code = c.goods_code
+		AND a.goods_code = c.pack_goods_code
+		AND b.id = #{id}
+	</select> -->
+	
+	<!-- <select id="findGoodsPackageListByGoodsCode" resultType="Goods">
+		SELECT 
+			<include refid="goodsColumns"/>
+		FROM goods_basic_info a,goods_basic_info b,goods_package_list c
+		<include refid="goodsJoins"/>
+		WHERE a.goods_code = c.goods_code
+		AND b.goods_code = c.pack_goods_code
+		AND b.id = #{id}
+	</select> -->
+	
+	<!-- <select id="findGoodsPackageListGoods" resultType="com.tuling.modules.goods.goods.entity.GoodsPackageGoodsFilter">
+	select
+		a.goods_code AS "goodsCode",
+		a.goods_name AS "goodsName",
+		d.goods_pic_id AS "goodsPicId"
+		FROM goods_basic_info b,goods_basic_info a,goods_package_list c,goods_pic_list d
+		WHERE b.goods_code = c.goods_code
+		AND a.goods_code = c.pack_goods_code
+    	AND d.goods_code = a.goods_code
+		AND b.id = #{id}
+		AND a.goods_status = '1'
+		AND d.goods_pic_flag = '1'
+	</select> -->
+    <!-- 查询商品表和产品包表的字段 By yuelingyun-->
+    <sql id="goodsAndPackageColumns">
+		a.id AS "id",
+		a.goods_code AS "goodsCode",
+		a.goods_name AS "goodsName",
+		a.goods_phoneticize AS "goodsPhoneticize",
+		a.goods_nature AS "goodsNature",
+		a.goods_type AS "goodsType",
+		a.goods_title AS "goodsTitle",
+		a.goods_class_code AS "goodsClassCode",
+		a.goods_validity_num AS "goodsValidityNum",
+		a.goods_validity_unit AS "goodsValidityUnit",
+		a.goods_price AS "goodsPrice",
+		a.goods_stock AS "goodsStock",
+		a.goods_status AS "goodsStatus",
+		a.goods_details AS "goodsDetails",
+		a.is_recommend AS "isRecommend",
+		a.create_by AS "createBy.id",
+		a.create_time AS "createTime",
+		a.update_by AS "updateBy.id",
+		a.update_time AS "updateTime",
+		a.remark AS "remark",
+		a.del_flag AS "delFlag",
+		GROUP_CONCAT(b.pack_goods_code SEPARATOR ',') AS "packGoodsCode"
+	</sql>
+	<!-- 通过关联商品表和产品包表的查询所有的数据 By yuelingyun-->
+	<select id="findGoodsAndPackageList" parameterType="GoodsFilter" resultType="Goods">
+		SELECT 
+			<include refid="goodsAndPackageColumns"/>
+		FROM goods_basic_info a
+		LEFT JOIN goods_package_list b on a.goods_code = b.goods_code
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="goodsCode != null and goodsCode != ''">
+					AND a.goods_code = #{goodsCode}
+			</if>
+			<if test="goodsName != null and goodsName != ''">
+				AND a.goods_name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{goodsName}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{goodsName}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{goodsName},'%')</if>
+			</if>
+			<if test="goodsClassCode != null and goodsClassCode != ''">
+				AND a.goods_class_code = #{goodsClassCode}
+			</if>
+			<if test="goodsStatus != null and goodsStatus != ''">
+				AND a.goods_status = #{goodsStatus}
+			</if>
+			
+		</where>
+		group by a.id,a.goods_code,a.goods_name,a.goods_phoneticize,a.goods_nature,a.goods_type,a.goods_title,a.goods_class_code,a.goods_validity_num,
+				 a.goods_validity_unit,a.goods_price,a.goods_stock,a.goods_status,a.update_by,a.update_time,a.remark,a.del_flag
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.goods_type,(a.goods_code+0),(b.pack_goods_code+0),(b.pack_goods_seq+0) ASC
+			</otherwise>
+		</choose>
+	</select>
+    <!-- 插入商品基本信息表 By yuelingyun -->
+    <insert id="insertGoodsSql" >
+        ${sqlString}
+    </insert>
+    
+    <select id="getGoodsCount" resultType="int">
+		SELECT 
+			count(*)
+		FROM goods_basic_info a
+		WHERE a.del_flag = '0'
+		
+	</select>
+	
+	<select id="getGoodsOnShelvesCount" resultType="int">
+		SELECT 
+			count(*)
+		FROM goods_basic_info a
+		WHERE a.del_flag = '0'
+		and a.goods_status = '1'
+	</select>
+	
+	<select id="getGoodsOffShelvesCount" resultType="int">
+		SELECT 
+			count(*)
+		FROM goods_basic_info a
+		WHERE a.del_flag = '0'
+		and a.goods_status = '0'
+	</select>
+	
+	<select id="findList" resultType="Goods">
+		SELECT 
+			<include refid="goodsColumns"/>
+		FROM goods_basic_info a
+		<include refid="goodsJoins"/>
+		WHERE a.goods_class_code = #{goodsClassCode}
+		And a.del_flag = '0'
+	</select>
+	
+	<select id="getGoodsPackageGoods" parameterType="com.tuling.modules.goods.goods.entity.GoodsFilterClassCodes" resultType="Goods">
+		SELECT 
+			<include refid="goodsColumns"/>
+		FROM goods_basic_info a
+		<where>
+			a.del_flag = '0'
+			<if test="goodsCode != null and goodsCode != ''">
+					AND a.goods_code = #{goodsCode}
+			</if>
+			<if test="goodsName != null and goodsName != ''">
+				AND a.goods_name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{goodsName}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{goodsName}+'%'</if>
+				    <if test="dbName == 'mysql'">concat('%',#{goodsName},'%')</if>
+			</if>
+			
+			<if test="goodsClassCode != null and goodsClassCode.size() > 0">
+				 AND a.goods_class_code IN 
+				  <foreach item="item" index="index" collection="goodsClassCode" 
+                         open="(" separator="," close=")">
+                        #{item}
+                </foreach> 
+			</if>  
+			<if test="goodsStatus != null and goodsStatus != ''">
+				AND a.goods_status = #{goodsStatus}
+			</if>
+			
+		</where>
+		AND a.goods_type = '1'
+		AND a.goods_status = '1'
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_time DESC
+			</otherwise>
+		</choose>
+	</select>
+    
+	
+</mapper>

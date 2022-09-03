@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tuling.modules.payment.refundlist.dao.RefundListInfoDao">
+    <sql id="refundListInfoColumns">
+		a.id AS "refundListInfo.id",
+		a.refund_id AS "refundListInfo.refundId",
+		a.payment_id AS "refundListInfo.paymentId",
+		a.order_code AS "refundListInfo.orderCode",
+		a.merchant_id AS "refundListInfo.merchantId",
+		a.public_account_id AS "refundListInfo.publicAccountId",
+		a.refund_amount AS "refundListInfo.refundAmount",
+	    a.refund_time AS "refundListInfo.refundTime",
+		a.refund_status AS "refundListInfo.refundStatus",
+		a.refund_way_code AS "refundListInfo.refundWayCode",
+		a.refund_return_code AS "refundListInfo.refundReturnCode",
+		a.refund_return_message AS "refundListInfo.refundReturnMessage",
+		a.create_by AS "refundListInfo.createBy.id",
+		a.create_time AS "refundListInfo.createTime",
+		a.update_by AS "refundListInfo.updateBy.id",
+		a.update_time AS "refundListInfo.updateTime",
+		a.remark AS "refundListInfo.remark",
+		a.del_flag AS "refundListInfo.delFlag"
+	</sql>
+	
+	<sql id="refundListColumns">
+		a.id AS "refundListInfo.id",
+		a.refund_id AS "refundListInfo.refundId",
+		a.payment_id AS "refundListInfo.paymentId",
+		a.order_code AS "refundListInfo.orderCode",
+		a.merchant_id AS "refundListInfo.merchantId",
+		a.public_account_id AS "refundListInfo.publicAccountId",
+		a.refund_amount AS "refundListInfo.refundAmount",
+	    a.refund_time AS "refundListInfo.refundTime",
+		a.refund_status AS "refundListInfo.refundStatus",
+		a.refund_way_code AS "refundListInfo.refundWayCode",
+		a.refund_return_code AS "refundListInfo.refundReturnCode",
+		a.refund_return_message AS "refundListInfo.refundReturnMessage",
+		a.create_by AS "refundListInfo.createBy.id",
+		a.create_time AS "refundListInfo.createTime",
+		a.update_by AS "refundListInfo.updateBy.id",
+		a.update_time AS "refundListInfo.updateTime",
+		a.remark AS "refundListInfo.remark"
+	</sql>
+	
+	<!-- <sql id="refundListInfoJoins">
+        LEFT JOIN order_info oi on oi.order_code = a.payment_id AND oi.del_flag = #{DEL_FLAG_NORMAL}
+    </sql> -->
+
+    <select id="queryRefundListInfoResultList" parameterType="RefundListInfoFilter" resultType="RefundListInfoResult">
+		SELECT 
+			<include refid="refundListInfoColumns"/>
+		FROM refund_list_info a
+	   <!--  <include refid="refundListInfoJoins"/> -->
+		<where>
+		    a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="refundStatus != null and refundStatus != ''">
+			    AND a.refund_status = #{refundStatus}
+		    </if>
+			<if test="refundId != null and refundId != ''">
+				AND (a.refund_id = #{refundId} OR a.payment_id= #{refundId} OR a.order_code= #{refundId})
+			</if>
+			<if test="refundWay != null and refundWay != ''">
+				AND a.refund_way_code = #{refundWay}
+			</if>
+			<if test="startRefundTime != null and startRefundTime != ''">
+			    <![CDATA[ AND DATE_FORMAT(a.refund_time, '%Y-%m-%d') >= DATE_FORMAT(#{startRefundTime}, '%Y-%m-%d')]]>
+			</if>
+			<if test="endRefundTime != null and endRefundTime != ''">
+			    <![CDATA[ AND DATE_FORMAT(a.refund_time, '%Y-%m-%d') <= DATE_FORMAT(#{endRefundTime}, '%Y-%m-%d')]]>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.refund_time DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+    <select id="get" resultType="RefundListInfoResult">
+		SELECT 
+			<include refid="refundListInfoColumns"/>
+		FROM refund_list_info a
+		<!-- <include refid="refundListInfoJoins"/> -->
+		WHERE a.id = #{id}
+	</select>
+	
+	<!-- 通过订单编号查询退款列表的信息 by yuelingyun-->
+	<select id="queryRefundListInfo" resultType="RefundListInfoResult" parameterType="RefundList">
+		SELECT 
+			<include refid="refundListColumns"/>
+		FROM refund_list_info a
+		WHERE a.order_code = #{orderCode}
+	</select>
+	
+	<!-- 通过订单编号查询退款列表的信息 by yuelingyun-->
+	<insert id="insertRefundListInfo" parameterType="RefundList">
+		insert into refund_list_info
+			(
+				id,
+				refund_id,
+				payment_id,
+				order_code,
+				merchant_id,
+				public_account_id,
+				refund_amount,
+				refund_time,
+				refund_status,
+				refund_way_code,
+				refund_return_code,
+				refund_return_message,
+				create_time,
+				create_by,
+				update_time,
+				update_by,
+				del_flag,
+				remark
+			)
+			VALUES
+			(
+				#{id},
+				#{refundId},
+				#{paymentId},
+				#{orderCode},
+				#{merchantId},
+				#{publicAccountId},
+				#{refundAmount},
+				#{refundTime},
+				#{refundStatus},
+				#{refundWayCode},
+				#{refundReturnCode},
+				#{refundReturnMessage},
+				#{createTime},
+				#{createBy.id},
+				#{updateTime},
+				#{updateBy.id},
+				#{delFlag},
+				#{remark}
+			)
+	</insert>
+	<!-- 通过订单编号查询退款列表的信息 by yuelingyun-->
+	<update id="updateRefundListInfo" parameterType="RefundList">
+		update refund_list_info set 
+				refund_id = #{refundId},
+				payment_id = #{paymentId},
+				order_code = #{orderCode},
+				merchant_id = #{merchantId},
+				public_account_id = #{publicAccountId},
+				refund_amount = #{refundAmount},
+				refund_time = #{refundTime},
+				refund_status = #{refundStatus},
+				refund_way_code = #{refundWayCode},
+				refund_return_code = #{refundReturnCode},
+				refund_return_message = #{refundReturnMessage},
+				update_time = #{updateTime},
+				update_by = #{updateBy.id}
+		where order_code = #{orderCode}
+	</update>
+</mapper>

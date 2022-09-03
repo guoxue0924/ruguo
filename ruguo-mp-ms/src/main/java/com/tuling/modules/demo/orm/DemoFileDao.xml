@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tuling.modules.demo.dao.DemoFileDao">
+    
+	<sql id="demoFileColumns">
+		a.id AS "id",
+		a.type AS "type",
+		a.user_id AS "demoUser.id",
+		a.file_name AS "fileName",
+		a.file_id AS "fileId",
+		a.create_by AS "createBy.id",
+		a.create_time AS "createTime",
+		a.update_by AS "updateBy.id",
+		a.update_time AS "updateTime",
+		a.del_flag AS "delFlag",
+		a.remark AS "remark",
+		u3.name AS "demoUser.name",
+		u3.email AS "demoUser.email"
+	</sql>
+	
+	<sql id="demoFileJoins">
+		LEFT JOIN demo_user u3 ON u3.id = a.user_id
+	</sql>
+    
+	<select id="get" resultType="DemoFile">
+		SELECT 
+			<include refid="demoFileColumns"/>
+		FROM demo_file a
+		<include refid="demoFileJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="DemoFile">
+		SELECT 
+			<include refid="demoFileColumns"/>
+		FROM demo_file a
+		<include refid="demoFileJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_time DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="DemoFile">
+		SELECT 
+			<include refid="demoFileColumns"/>
+		FROM demo_file a
+		<include refid="demoFileJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_time DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO demo_file(
+			id,
+			type,
+			user_id,
+			file_name,
+			file_id,
+			create_by,
+			create_time,
+			update_by,
+			update_time,
+			del_flag,
+			remark
+		) VALUES (
+			#{id},
+			#{type},
+			#{demoUser.id},
+			#{fileName},
+			#{fileId},
+			#{createBy.id},
+			#{createTime},
+			#{updateBy.id},
+			#{updateTime},
+			#{delFlag},
+			#{remark}
+		)
+	</insert>
+	
+	<insert id="insertByBatch" parameterType="java.util.List">
+		WITH R AS
+	  <foreach collection="list" item="item" index="index" open="(" close=")" separator="union all">
+	    SELECT #{item.id}　as a,
+			#{item.type} as b,
+			#{item.demoUser.id} as c,
+			#{item.fileName} as d,
+			#{item.fileId} as e,
+			#{item.createBy.id} as f,
+			#{item.createTime} as g,
+			#{item.updateBy.id} as h ,
+			#{item.updateTime}as i,
+			#{item.delFlag} as j,
+			#{item.remark} as k
+	  </foreach>
+		INSERT INTO demo_file(
+			id,
+			type,
+			user_id,
+			file_name,
+			file_id,
+			create_by,
+			create_time,
+			update_by,
+			update_time,
+			del_flag,
+			remark
+		)  SELECT a, b,c,d,e,f,g,h,i,j,k FROM R
+        
+	</insert>
+	
+	<update id="update">
+		UPDATE demo_file SET 	
+			type = #{type},
+			user_id = #{demoUser.id},
+			file_name = #{fileName},
+			file_id = #{fileId},
+			update_by = #{updateBy.id},
+			update_time = #{updateTime},
+			remark = #{remark}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE demo_file SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

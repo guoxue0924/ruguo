@@ -1,0 +1,160 @@
+body {
+    min-width: 970px;
+    padding-top: 0px;
+    padding-bottom: 10px;
+    background-color: #DBEEF2;
+    background-color: rgba(219, 238, 242, 10);
+}
+
+hr {
+    border-top: 1px solid #45abbb;
+}
+
+p {
+    color: #3e91ad;
+    font: 12px 'Microsoft Yahei', Arial, sans-serif;
+}
+
+a {
+    color: #3e91ad;
+}
+
+.panel-default {
+    border-color: #ffffff;
+    border-radius: 4px;
+}
+
+.form-control {
+    border: 1px solid #4aa7c6;
+}
+
+.form-control:focus {
+    border-color: #4aa7c7;
+}
+
+.btn-primary {
+    background-color: #4aa7c6;
+    border-color: #3d95b3;
+}
+
+.btn-primary:focus, .btn-primary.focus {
+    color: #ffffff;
+    background-color: #53b7d8;
+    border-color: #4aa7c6;
+}
+
+.btn-primary:hover, .btn-primary.hover {
+    color: #ffffff;
+    background-color: #53b7d8;
+    border-color: #4aa7c6;
+}
+
+.btn-primary:active, .btn-primary.active, .open > .dropdown-toggle.btn-primary {
+    color: #ffffff;
+    background-color: #4aa7c6;
+    border-color: #4aa7c6;
+}
+
+.btn-primary:active:hover, .btn-primary.active:hover, .open > .dropdown-toggle.btn-primary:hover, .btn-primary:active:focus, .btn-primary.active:focus, .open > .dropdown-toggle.btn-primary:focus, .btn-primary:active.focus, .btn-primary.active.focus, .open > .dropdown-toggle.btn-primary.focus {
+    color: #ffffff;
+    background-color: #4aa6c6;
+    border-color: #4aa7c6;
+}
+
+.container-login {
+    width: 970px;
+    min-width: 970px;
+    margin-right: auto;
+    margin-left: auto;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.jumbotron-login .container {
+    max-width: 100%;
+    margin-top: 100px;
+}
+
+.parent {
+    position: fixed;
+    top: 40%;
+    bottom: 60%;
+    left: 50%;
+    right: 50%;
+    width: 0;
+    height: 0;
+}
+
+.jumbotron-login {
+    height: 320px;
+    width: 1000px;
+    margin-left: -500px;
+    margin-top: -160px;
+}
+
+#bglogin {
+    margin-left: 20%;
+    height: 320px;
+    width: 320px;
+    background-image: url("../image/bg01.png");
+    background-size: contain;
+    -moz-background-size: contain;
+    -webkit-background-size: contain;
+    /*background-position: center;*/
+    background-repeat: no-repeat;
+    filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='../image/bg01.png', sizingMethod='scale') \0;
+}
+
+.col-xs-4 {
+    width: 280px;
+}
+
+.panel-login .panel-title {
+    background-repeat: no-repeat;
+    height: 44px;
+    padding-left: 40px;
+    padding-top: 15px;
+    margin: 20px 15px 10px;
+    /*margin-bottom: 10px;*/
+    color: #3e91ad;
+    font: 18px 'Microsoft Yahei', Arial, sans-serif;
+}
+
+.panel-login .panel-title small {
+    color: #c3c5c6;
+    font: 14px Arial;
+}
+
+.panel-login .panel-body {
+    padding: 0px 25px 25px;
+}
+
+.panel-login .form-group > label, .panel-login .input-group > label {
+    color: #506575;
+    font: 14px 'Microsoft Yahei', Arial, sans-serif;
+}
+
+.panel-login .form-group .link-login {
+    height: 19px;
+    line-height: 19px;
+    float: right;
+    padding-top: 2px;
+    font: 12px 'Microsoft Yahei', Arial, sans-serif;
+}
+
+.panel-login .form-group > label i, .panel-login .input-group > label i {
+    color: #4aa7c6;
+}
+
+.panel-login button {
+    font: 18px 'Microsoft Yahei', Arial, sans-serif;
+}
+
+.error{
+    color: #ec514e;
+    font: 14px 'Microsoft Yahei', Arial, sans-serif;
+}
+.btn-primary.disabled, .btn-primary[disabled], fieldset[disabled] .btn-primary, .btn-primary.disabled:hover, .btn-primary[disabled]:hover, fieldset[disabled] .btn-primary:hover, .btn-primary.disabled:focus, .btn-primary[disabled]:focus, fieldset[disabled] .btn-primary:focus, .btn-primary.disabled.focus, .btn-primary[disabled].focus, fieldset[disabled] .btn-primary.focus, .btn-primary.disabled:active, .btn-primary[disabled]:active, fieldset[disabled] .btn-primary:active, .btn-primary.disabled.active, .btn-primary[disabled].active, fieldset[disabled] .btn-primary.active {
+    background-color: #53b7d8;
+    border-color: #4aa7c6;
+}

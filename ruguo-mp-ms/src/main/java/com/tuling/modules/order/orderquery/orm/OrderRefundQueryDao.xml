@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tuling.modules.order.orderquery.dao.OrderRefundQueryDao">
+     <sql id="orderRefundColumns">
+		a.id AS "orderRefund.id",
+		a.order_code AS "orderRefund.orderCode",
+		a.refund_person AS "orderRefund.refundPerson",
+		a.refund_amount AS "orderRefund.refundAmount",
+		a.refund_time AS "orderRefund.refundTime",
+		a.refund_reason AS "orderRefund.refundReason",
+		a.operation_examiner AS "orderRefund.operationExaminer",
+		a.approval_status AS "orderRefund.approvalStatus",
+		a.approval_opinion AS "orderRefund.approvalOpinion",
+		a.operation_examine_time AS "orderRefund.operationExamineTime",
+		a.finance_examiner AS "orderRefund.financeExaminer",
+		a.finance_examine_status AS "orderRefund.financeExamineStatus",
+		a.finance_examine_opinion AS "orderRefund.financeExamineOpinion",
+		a.finance_examine_time AS "orderRefund.financeExamineTime",
+		a.create_by AS "orderRefund.createBy.id",
+		a.create_time AS "orderRefund.createTime",
+		a.update_by AS "orderRefund.updateBy.id",
+		a.update_time AS "orderRefund.updateTime",
+		a.remark AS "orderRefund.remark",
+		a.del_flag AS "orderRefund.delFlag"
+	</sql>
+	<!-- 插入审核信息 -->
+	<insert id="insert">
+		INSERT INTO order_refund_info(
+			id,
+			order_code,
+			refund_person,
+			refund_amount,
+			refund_time,
+			refund_reason,
+			operation_examiner,
+			approval_status,
+			approval_opinion,
+			operation_examine_time,
+			finance_examiner,
+			finance_examine_status,
+			finance_examine_opinion,
+			finance_examine_time,
+			create_by,
+			create_time,
+			update_by,
+			update_time,
+			remark,
+			del_flag
+		) VALUES (
+			#{id},
+			#{orderCode},
+			#{refundPerson},
+			#{refundAmount},
+			#{refundTime},
+			#{refundReason},
+			#{operationExaminer},
+			#{approvalStatus},
+			#{approvalOpinion},
+			#{operationExamineTime},
+			#{financeExaminer},
+			#{financeExamineStatus},
+			#{financeExamineOpinion},
+			#{financeExamineTime},
+			#{createBy.id},
+			#{createTime},
+			#{updateBy.id},
+			#{updateTime},
+			#{remark},
+			#{delFlag}
+		)
+	</insert>
+	<!-- 更新审核信息 -->
+    <update id="update">
+		UPDATE order_refund_info SET 
+			refund_person = #{refundPerson},
+			refund_amount = #{refundAmount},
+			refund_time = #{refundTime},
+			refund_reason = #{refundReason},
+			update_by = #{refundPerson},
+			update_time = now()
+		WHERE id = #{id}
+	</update>	
+	<!-- 获取审核信息 -->
+	<select id="get" resultType="OrderRefund">
+		SELECT 
+			<include refid="orderRefundColumns"/>
+		FROM order_refund_info a
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="getOrderRefundInfoByCode" parameterType="com.tuling.modules.order.orderquery.entity.Order" resultType="OrderRefund">
+		SELECT 
+			*
+		FROM order_refund_info a
+		WHERE a.order_code = #{orderCode}
+	</select>
+	
+	<update id="saveOperationExaminer">
+		UPDATE order_refund_info SET 
+			operation_examiner = #{operationExaminer},
+			approval_status = #{approvalStatus},
+			approval_opinion = #{approvalOpinion},
+			operation_examine_time = #{operationExamineTime},
+			update_by = #{operationExaminer},
+			update_time = now()
+		WHERE id = #{id}
+	</update>	
+</mapper>

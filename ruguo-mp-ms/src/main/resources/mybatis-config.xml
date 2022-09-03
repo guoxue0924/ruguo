@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+
+	<!-- 全局参数 -->
+	<settings>
+		<!-- 使全局的映射器启用或禁用缓存。 -->
+		<setting name="cacheEnabled" value="true"/>
+		
+		<!-- 全局启用或禁用延迟加载。当禁用时，所有关联对象都会即时加载。 -->
+		<setting name="lazyLoadingEnabled" value="true"/>
+		
+		<!-- 当启用时，有延迟加载属性的对象在被调用时将会完全加载任意属性。否则，每种属性将会按需要加载。 -->
+		<setting name="aggressiveLazyLoading" value="true"/>
+		
+		<!-- 是否允许单条sql 返回多个数据集  (取决于驱动的兼容性) default:true -->
+		<setting name="multipleResultSetsEnabled" value="true"/>
+		
+		<!-- 是否可以使用列的别名 (取决于驱动的兼容性) default:true -->
+		<setting name="useColumnLabel" value="true"/>
+		
+		<!-- 允许JDBC 生成主键。需要驱动器支持。如果设为了true，这个设置将强制使用被生成的主键，有一些驱动器不兼容不过仍然可以执行。  default:false  -->
+		<setting name="useGeneratedKeys" value="false"/>
+		
+		<!-- 指定 MyBatis 如何自动映射 数据基表的列 NONE：不隐射　PARTIAL:部分  FULL:全部  -->  
+		<setting name="autoMappingBehavior" value="PARTIAL"/>
+		
+		<!-- 这是默认的执行类型  （SIMPLE: 简单； REUSE: 执行器可能重复使用prepared statements语句；BATCH: 执行器可以重复执行语句和批量更新）  -->
+		<setting name="defaultExecutorType" value="SIMPLE"/>
+		
+		<!-- 使用驼峰命名法转换字段。 -->
+		<setting name="mapUnderscoreToCamelCase" value="true"/>
+		
+		<!-- 设置本地缓存范围 session:就会有数据的共享  statement:语句范围 (这样就不会有数据的共享 ) defalut:session -->
+        <setting name="localCacheScope" value="SESSION"/>
+		
+        <!-- 设置但JDBC类型为空时,某些驱动程序 要指定值,default:OTHER，插入空值时不需要指定类型 -->
+        <setting name="jdbcTypeForNull" value="NULL"/>
+		
+	</settings>
+	
+	<!-- 类型别名 -->
+	<typeAliases>
+		<typeAlias alias="Page" type="com.foundation.common.persistence.Page" /><!--分页  -->
+		<typeAlias alias="Dict" type="com.foundation.modules.sys.entity.Dict" />
+		<typeAlias alias="DictZone" type="com.foundation.modules.sys.entity.DictZone" />
+		<typeAlias alias="DictZoneFilter" type="com.foundation.modules.sys.entity.DictZoneFilter" />
+		<typeAlias alias="Log" type="com.foundation.modules.sys.entity.Log" />
+		<typeAlias alias="Menu" type="com.foundation.modules.sys.entity.Menu" />
+		<typeAlias alias="Organization" type="com.foundation.modules.sys.entity.Organization" />
+		<typeAlias alias="Role" type="com.foundation.modules.sys.entity.Role" />
+		<typeAlias alias="SqlEntity" type="com.foundation.modules.sys.entity.SqlEntity" />
+		<typeAlias alias="User" type="com.foundation.modules.sys.entity.User" />
+		<typeAlias alias="UserFilter" type="com.foundation.modules.sys.entity.UserFilter" />
+		<typeAlias alias="DemoFile" type="com.tuling.modules.demo.entity.DemoFile" />
+		<typeAlias alias="DemoUser" type="com.tuling.modules.demo.entity.DemoUser" />
+		<typeAlias alias="DemoUserFilter" type="com.tuling.modules.demo.entity.DemoUserFilter" />
+		<typeAlias alias="Goods" type="com.tuling.modules.goods.goods.entity.Goods" />
+		<typeAlias alias="GoodsFilter" type="com.tuling.modules.goods.goods.entity.GoodsFilter" />
+		<typeAlias alias="GoodsPicList" type="com.tuling.modules.goods.goods.entity.GoodsPicList" />
+		<typeAlias alias="GoodsRateList" type="com.tuling.modules.goods.goods.entity.GoodsRateList" />
+		<typeAlias alias="GoodsClassInfo" type="com.tuling.modules.goods.goodsclass.entity.GoodsClassInfo" />
+		<typeAlias alias="MemberLevelInfo" type="com.tuling.modules.member.memberlevel.entity.MemberLevelInfo" />
+		<typeAlias alias="MemberAdressList" type="com.tuling.modules.member.memberquery.entity.MemberAdressList" />
+	    <typeAlias alias="MemberBasicInfoResult" type="com.tuling.modules.member.memberquery.entity.MemberBasicInfoResult" />
+		<typeAlias alias="MemberBasicInfoFilter" type="com.tuling.modules.member.memberquery.entity.MemberBasicInfoFilter" />
+	    <typeAlias alias="MemberBasicInfo" type="com.tuling.modules.member.memberquery.entity.MemberBasicInfo" />
+	    <typeAlias alias="MemberBasicInfoResultResult" type="com.tuling.modules.member.memberquery.entity.MemberBasicInfoResultResult" />
+		<typeAlias alias="MemberRelationshipInfo" type="com.tuling.modules.member.memberquery.entity.MemberRelationshipInfo" />
+		<typeAlias alias="OrderFilter" type="com.tuling.modules.order.orderquery.entity.OrderFilter" />
+		<typeAlias alias="OrderGoods" type="com.tuling.modules.order.orderquery.entity.OrderGoods" />
+		<typeAlias alias="Order" type="com.tuling.modules.order.orderquery.entity.Order" />
+		<typeAlias alias="OrderRefund" type="com.tuling.modules.order.orderquery.entity.OrderRefund" />
+		<typeAlias alias="PayMentListInfoFilter" type="com.tuling.modules.payment.paymentlist.entity.PayMentListInfoFilter" />
+	    <typeAlias alias="PayMentListInfoResult" type="com.tuling.modules.payment.paymentlist.entity.PayMentListInfoResult" />
+		<typeAlias alias="RefundListInfoFilter" type="com.tuling.modules.payment.refundlist.entity.RefundListInfoFilter" />
+		<typeAlias alias="RefundListInfoResult" type="com.tuling.modules.payment.refundlist.entity.RefundListInfoResult" />
+	    <typeAlias alias="RefundList" type="com.tuling.modules.order.orderquery.entity.RefundList" />
+		<typeAlias alias="MemberFeedbackFilter" type="com.tuling.modules.personal.entity.MemberFeedbackFilter" />
+		<typeAlias alias="MemberFeedbackResult" type="com.tuling.modules.personal.entity.MemberFeedbackResult" />
+	
+	
+	</typeAliases>
+	
+	<!-- 插件配置 -->
+	<plugins>
+		<plugin interceptor="com.foundation.common.persistence.interceptor.PaginationInterceptor" >
+			<property name="dbType" value="mysql"/> <!-- mysql的方言 -->
+		</plugin>
+    </plugins>
+	
+</configuration>

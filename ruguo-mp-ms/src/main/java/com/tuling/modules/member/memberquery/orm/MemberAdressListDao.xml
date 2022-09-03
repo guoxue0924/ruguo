@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tuling.modules.member.memberquery.dao.MemberAdressListDao"> 
+   
+	<sql id="memberAdressListColumns">
+		a.id AS "id",
+		a.addrss_type AS "addrssType",
+		a.province_name AS "provinceName",
+		a.city_name AS "cityName",
+		a.county_name AS "countyName",
+		a.address AS "address",
+	    a.post_code AS "postCode",
+		a.create_by AS "createBy.id",
+		a.create_time AS "createTime",
+		a.update_by AS "updateBy.id",
+		a.update_time AS "updateTime",
+		a.remark AS "remark",
+		a.del_flag AS "delFlag"
+    </sql>
+    
+	<select id="queryMemberAdressList"  resultType="MemberAdressList">
+		SELECT 
+			<include refid="memberAdressListColumns"/>
+		FROM member_address_list a
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="memberCode != null and memberCode != ''">
+				AND a.member_code = #{memberCode}
+			</if>
+		</where>
+	</select>
+	
+	
+	<select id="getMemberAdressFilter"  resultType="com.tuling.modules.member.memberquery.entity.MemberAdressFilter">
+		select 
+			b.person_name AS personName,
+			b.mobile_phone AS mobilePhone,
+			CONCAT(IFNULL(b.province_name,""),IFNULL(b.city_name,""),IFNULL(b.county_name,""),IFNULL(b.town_name,""),IFNULL(b.address,""))  AS address
+		FROM member_address_list b
+		WHERE b.member_code = #{code}
+	</select>
+	
+</mapper>

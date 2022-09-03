@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tuling.modules.payment.paymentlist.dao.PayMentListInfoDao">
+    <sql id="payMentListInfoColumns">
+		a.id AS "payMentListInfo.id",
+		a.payment_id AS "payMentListInfo.paymentId",
+		a.order_code AS "payMentListInfo.orderCode",
+		a.merchant_id AS "payMentListInfo.merchantId",
+		a.public_account_id AS "payMentListInfo.publicAccountId",
+		a.pay_amount AS "payMentListInfo.payAmount",
+	    a.transaction_time AS "payMentListInfo.transactionTime",
+		a.pay_status AS "payMentListInfo.payStatus",
+		a.pay_way_code AS "payMentListInfo.payWayCode",
+		a.pay_return_code AS "payMentListInfo.payReturnCode",
+		a.pay_return_message AS "payMentListInfo.payReturnMessage",
+		a.create_by AS "payMentListInfo.createBy.id",
+		a.create_time AS "payMentListInfo.createTime",
+		a.update_by AS "payMentListInfo.updateBy.id",
+		a.update_time AS "payMentListInfo.updateTime",
+		a.remark AS "payMentListInfo.remark",
+		a.del_flag AS "payMentListInfo.delFlag"
+	</sql>
+	
+	<!-- <sql id="payMentListInfoJoins">
+        LEFT JOIN order_info oi on oi.order_code = a.payment_id AND oi.del_flag = #{DEL_FLAG_NORMAL}
+    </sql> -->
+
+    <select id="queryPayMentListInfoResultList" parameterType="PayMentListInfoFilter" resultType="PayMentListInfoResult">
+		SELECT 
+			<include refid="payMentListInfoColumns"/>
+		FROM payment_list_info a
+	    <!-- <include refid="payMentListInfoJoins"/> -->
+		<where>
+		    a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="payStatus != null and payStatus != ''">
+			    AND a.pay_status = #{payStatus}
+		    </if>
+			<if test="paymentId != null and paymentId != ''">
+				AND (a.payment_id  LIKE 
+			    <if test="dbName == 'oracle'">'%'||#{paymentId}||'%'</if>
+			    <if test="dbName == 'mssql'">'%'+#{paymentId}+'%'</if>
+			    <if test="dbName == 'mysql'">concat('%',#{paymentId},'%')</if>  
+				OR a.order_code LIKE 
+			    <if test="dbName == 'oracle'">'%'||#{paymentId}||'%'</if>
+			    <if test="dbName == 'mssql'">'%'+#{paymentId}+'%'</if>
+			    <if test="dbName == 'mysql'">concat('%',#{paymentId},'%')</if>  )
+			</if>
+			<if test="orderPayWay != null and orderPayWay != ''">
+				AND a.pay_way_code = #{orderPayWay}
+			</if>
+			<if test="startTransactionTime != null and startTransactionTime != ''">
+			    <![CDATA[ AND DATE_FORMAT(a.transaction_time, '%Y-%m-%d') >= DATE_FORMAT(#{startTransactionTime}, '%Y-%m-%d')]]>
+			</if>
+			<if test="endTransactionTime != null and endTransactionTime != ''">
+			    <![CDATA[ AND DATE_FORMAT(a.transaction_time, '%Y-%m-%d') <= DATE_FORMAT(#{endTransactionTime}, '%Y-%m-%d')]]>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.transaction_time DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+    <select id="get" resultType="PayMentListInfoResult">
+		SELECT 
+			<include refid="payMentListInfoColumns"/>
+		FROM payment_list_info a
+		<!-- <include refid="payMentListInfoJoins"/> -->
+		WHERE a.id = #{id}
+	</select>
+	
+</mapper>

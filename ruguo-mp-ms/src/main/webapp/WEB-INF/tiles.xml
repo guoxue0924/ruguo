@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE tiles-definitions PUBLIC "-//Apache Software Foundation//DTD Tiles Configuration 3.0//EN" "http://tiles.apache.org/dtds/tiles-config_3_0.dtd">
+<tiles-definitions>
+
+    <!-- 基础模板页-头-菜单-工作区-底 -->
+    <definition name="template.base1" template="/WEB-INF/views/layout/template1.jsp"></definition>
+    <!-- 基础模板页-头-工作区-底 -->
+    <definition name="template.base2" template="/WEB-INF/views/layout/template2.jsp"></definition>
+    <!-- 基础模板页-弹出页-->
+    <definition name="template.base3" template="/WEB-INF/views/layout/template3.jsp"></definition>
+    <!-- 基础模板页-公共函数 -->
+    <definition name="template.common" template="/WEB-INF/views/layout/common.jsp"></definition>
+    <!-- 基础模板页-head标签 -->
+    <definition name="template.head" template="/WEB-INF/views/layout/head.jsp"></definition>
+    <!-- 基础模板页-页头 -->
+    <definition name="template.header" template="/WEB-INF/views/layout/header.jsp"></definition>
+    <!-- 基础模板页-菜单 -->
+    <definition name="template.menu" template="/WEB-INF/views/layout/menu.jsp"></definition>
+    <!-- 基础模板页-页底 -->
+    <definition name="template.footer" template="/WEB-INF/views/layout/footer.jsp"></definition>
+
+    <definition name="template.layout1" extends="template.base1">
+        <put-attribute name="common" value="template.common" />
+        <put-attribute name="head" value="template.head" />
+        <put-attribute name="header" value="template.header" />
+        <put-attribute name="menu" value="template.menu" />
+        <put-attribute name="footer" value="template.footer" />
+    </definition>
+    <definition name="layout1.*.*.*" extends="template.layout1">
+        <put-attribute name="content" value="/WEB-INF/views/modules/{1}/{2}/{3}.jsp" />
+    </definition>
+    <definition name="layout1.*.*" extends="template.layout1">
+        <put-attribute name="content" value="/WEB-INF/views/modules/{1}/{2}.jsp" />
+    </definition>
+    
+    <definition name="template.layout2" extends="template.base2">
+        <put-attribute name="common" value="template.common" />
+        <put-attribute name="head" value="template.head" />
+        <put-attribute name="header" value="template.header" />
+        <put-attribute name="footer" value="template.footer" />
+    </definition>
+    <definition name="layout2.*.*.*" extends="template.layout2">
+        <put-attribute name="content" value="/WEB-INF/views/modules/{1}/{2}/{3}.jsp" />
+    </definition>
+    <definition name="layout2.*.*" extends="template.layout2">
+        <put-attribute name="content" value="/WEB-INF/views/modules/{1}/{2}.jsp" />
+    </definition>
+    
+    <definition name="layout3.*.*.*" extends="template.base3">
+        <put-attribute name="content" value="/WEB-INF/views/modules/{1}/{2}/{3}.jsp" />
+    </definition>
+    <definition name="layout3.*.*" extends="template.base3">
+        <put-attribute name="content" value="/WEB-INF/views/modules/{1}/{2}.jsp" />
+    </definition>
+    
+    
+</tiles-definitions>
